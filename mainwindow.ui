@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1356</width>
+    <height>768</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>6</number>
+    </property>
+    <property name="leftMargin">
+     <number>6</number>
+    </property>
+    <property name="topMargin">
+     <number>6</number>
+    </property>
+    <property name="rightMargin">
+     <number>6</number>
+    </property>
+    <property name="bottomMargin">
+     <number>6</number>
+    </property>
+    <item>
+     <widget class="QGroupBox" name="mainGB">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>230</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QGroupBox {
+    margin-top: 0px;
+}</string>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
+      <widget class="QPushButton" name="ImportOBJ">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>85</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Open File</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="gradientCB">
+       <property name="geometry">
+        <rect>
+         <x>15</x>
+         <y>220</y>
+         <width>156</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Gradients</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="controlNetCB">
+       <property name="geometry">
+        <rect>
+         <x>15</x>
+         <y>250</y>
+         <width>171</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Control net</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="colourSurfaceCB">
+       <property name="geometry">
+        <rect>
+         <x>15</x>
+         <y>280</y>
+         <width>151</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Colour surface</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="clickCB">
+       <property name="geometry">
+        <rect>
+         <x>15</x>
+         <y>380</y>
+         <width>87</width>
+         <height>33</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>Faces</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Points</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Edges</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QSlider" name="gradSlider">
+       <property name="geometry">
+        <rect>
+         <x>15</x>
+         <y>190</y>
+         <width>160</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="value">
+        <number>33</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="refineFacePB">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>15</x>
+         <y>525</y>
+         <width>85</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Refine face</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="skeletonCB">
+       <property name="geometry">
+        <rect>
+         <x>15</x>
+         <y>340</y>
+         <width>87</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Skeleton</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="methodLE">
+       <property name="geometry">
+        <rect>
+         <x>15</x>
+         <y>455</y>
+         <width>113</width>
+         <height>27</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="ImportTRI">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>65</y>
+         <width>85</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Triangle</string>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="spinBox">
+       <property name="geometry">
+        <rect>
+         <x>15</x>
+         <y>110</y>
+         <width>45</width>
+         <height>27</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="makeNGonPB">
+       <property name="geometry">
+        <rect>
+         <x>15</x>
+         <y>565</y>
+         <width>85</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Make n gon</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="toStringPB">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>715</y>
+         <width>85</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>To string</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="toNewMeshPB">
+       <property name="geometry">
+        <rect>
+         <x>15</x>
+         <y>620</y>
+         <width>85</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>To new mesh</string>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="MainView" name="mainView"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MainView</class>
+   <extends>QOpenGLWidget</extends>
+   <header>mainview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
