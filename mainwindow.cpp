@@ -91,7 +91,6 @@ void MainWindow::on_refineFacePB_clicked()
                 );
 
 //    qDebug() << obj.vertexCoords;
-    currentMesh++;
     ui->mainView->rndrbles->controlMesh->mesh = new Mesh;
     ui->mainView->rndrbles->init(&obj);
 }
@@ -99,10 +98,6 @@ void MainWindow::on_refineFacePB_clicked()
 void MainWindow::on_methodLE_editingFinished()
 {
     if (not ui->mainView->mouseHandler->isStarted)
-        return;
-
-    short int index = static_cast<short int>(ui->mainView->disp);
-    if (index == -1)
         return;
 
     QString text = ui->methodLE->text();
@@ -136,10 +131,8 @@ void MainWindow::on_ImportTRI_clicked()
 void MainWindow::on_makeNGonPB_clicked()
 {
     OBJFile obj = makeNGON(5);
-    currentMesh++;
     ui->mainView->rndrbles->controlMesh->mesh = new Mesh;
     ui->mainView->rndrbles->init(&obj);
-
 }
 
 void MainWindow::on_toStringPB_clicked()
@@ -148,13 +141,13 @@ void MainWindow::on_toStringPB_clicked()
     QString str;
     Vertex *vtx;
     Face *face;
-    for (size_t i = 0; i < mesh->Vertices.size(); ++i){
+    for (int i = 0; i < mesh->Vertices.size(); ++i){
         vtx = &mesh->Vertices[i];
         str.append(vtxToString(vtx));
         str.append("\n");
     }
     str.append("s off\n");
-    for (size_t i = 0; i < mesh->Faces.size(); ++i){
+    for (int i = 0; i < mesh->Faces.size(); ++i){
         face = &mesh->Faces[i];
         str.append(faceToString(face));
         str.append("\n");
@@ -163,23 +156,19 @@ void MainWindow::on_toStringPB_clicked()
     qDebug().noquote() << str;
 }
 
-
-
-
-
 void MainWindow::on_toNewMeshPB_clicked()
 {
     Mesh *mesh = ui->mainView->rndrbles->colourSurface->mesh;
     QString str;
     Vertex *vtx;
     Face *face;
-    for (size_t i = 0; i < mesh->Vertices.size(); ++i){
+    for (int i = 0; i < mesh->Vertices.size(); ++i){
         vtx = &mesh->Vertices[i];
         str.append(vtxToString(vtx));
         str.append("\n");
     }
     str.append("s off\n");
-    for (size_t i = 0; i < mesh->Faces.size(); ++i){
+    for (int i = 0; i < mesh->Faces.size(); ++i){
         face = &mesh->Faces[i];
         str.append(faceToString(face));
         str.append("\n");
@@ -199,4 +188,9 @@ void MainWindow::on_toNewMeshPB_clicked()
 
 
     ui->mainView->rndrbles->init(&obj);
+}
+
+void MainWindow::on_refineCB_toggled(bool checked)
+{
+    ui->mainView->showRefine = checked;
 }

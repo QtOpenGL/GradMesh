@@ -13,6 +13,7 @@ public:
     virtual ~Renderables();
     MeshRenderable *controlMesh;
     MeshRenderable *colourSurface;
+    MeshRenderable *refineMesh;
     ControlRenderable *skeletonMesh;
 
     Renderable *edgeRenderable;
@@ -28,17 +29,6 @@ public:
     QVector <refiner> refiners;
 
     size_t cc_steps = 2;
-    size_t quadrant = 0;
-    /*
-     *  split screen:
-     *
-     * | 1 | 2 |
-     * |-------|
-     * | 3 | 4 |
-     *
-     * 0 is whole screen
-     *
-     */
     void updateEm();
     void init(OBJFile* loadedOBJFile);
     void init(Mesh *mesh);

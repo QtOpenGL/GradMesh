@@ -287,7 +287,7 @@ QString faceToString(Face *face, HalfEdge *startEdge){
 HalfEdge* isNeighbour(Face *face1, Face *face2){
     size_t n = face1->val;
     HalfEdge *currentEdge = face1->side;
-    for (int i = 0; i < n; ++i){
+    for (size_t i = 0; i < n; ++i){
         if (currentEdge->twin->polygon == face2)
             return currentEdge;
         currentEdge = currentEdge->next;

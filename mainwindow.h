@@ -12,7 +12,6 @@ class MainWindow : public QMainWindow {
 
     Q_OBJECT
 
-    size_t currentMesh = 0;
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -31,6 +30,8 @@ private slots:
     void on_makeNGonPB_clicked();
     void on_toStringPB_clicked();
     void on_toNewMeshPB_clicked();
+
+    void on_refineCB_toggled(bool checked);
 
 private:
     Ui::MainWindow *ui;

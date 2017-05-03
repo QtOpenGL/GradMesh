@@ -1,8 +1,20 @@
 #include "meshtools.h"
 
-void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
+int allSameFaceIndex(Face *face){
+    HalfEdge *currentEdge = face->side;
+    int index = currentEdge->target->originalFaceIndex;
+    if (index == -1)
+        return -1;
+    for (int i = 0; i < face->val; ++i){
+        if (currentEdge->target->originalFaceIndex != index)
+            return -1;
+        currentEdge = currentEdge->next;
+    }
+    return index;
+}
 
-  subdivMesh->firstCC = false;
+
+void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
 
   unsigned int numVerts, numHalfEdges, numFaces, sumFaceValences;
   unsigned int k, m, s, t;
@@ -39,13 +51,17 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
   for (k=0; k<numFaces; k++) {
     n = inputMesh->Faces[k].val;
     newVert = facePoint(inputMesh->Faces[k].side);
+
+//    int fIndex = allSameFaceIndex(&inputMesh->Faces[k]);
+
     // Coords (x,y), Out, Valence, Index
     subdivMesh->Vertices.append( Vertex(newVert.pos,
                                         nullptr,
                                         n,
                                         k,
                                         0,
-                                        newVert.col) );
+                                        newVert.col
+                                        ) );
   }
 
 //  qDebug() << " * Created face points";
@@ -55,15 +71,13 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
   for (k=0; k<numVerts; k++) {
       n = inputMesh->Vertices[k].val;
       newVert = vertexPoint(inputMesh->Vertices[k].out, subdivMesh);
-
-      QVector2D newPos = inputMesh->firstCC ? inputMesh->Vertices[k].coords : newVert.pos;
-
       subdivMesh->Vertices.append( Vertex(newVert.pos,
                                           nullptr,
                                           n,
                                           vIndex,
                                           0,
-                                          newVert.col) );
+                                          newVert.col
+                                          ) );
       vIndex++;
     }
 

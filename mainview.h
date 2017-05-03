@@ -27,21 +27,12 @@ public:
     bool showGradients = true;
     bool showColourSurface = true;
     bool showSkeleton = false;
+    bool showRefine = false;
 
     QOpenGLShaderProgram* mainShaderProg,* blackShaderProg,* whiteShaderProg,* greyShaderProg;
 
-    DISPLAY disp = DISPLAY::ORIGINAL;
-
     Renderables *rndrbles;
     MouseHandler *mouseHandler;
-
-    float quadrantEntries[5][3] = {
-        {0.0f, 0.0f, 1.0f},
-        {0.5f, -0.5f, 0.5f},
-        {-0.5f, -0.5f, 0.5f},
-        {0.5f, 0.5f, 0.5f},
-        {-0.5f, 0.5f, 0.5f}
-    };
     void createBuffer();
 
 protected:
@@ -53,16 +44,12 @@ protected:
 
 private:
 
-    void bindShader(QOpenGLShaderProgram *program, size_t qdrnt);
-
-    int uniDx[3];
-    int uniDy[3];
-    int uniScale[3];
+    void bindShader(QOpenGLShaderProgram *program);
 
     void registerRenderable(Renderable *obj);
     void updateRenderable(Renderable *obj);
-    void renderRenderable(Renderable *obj, QOpenGLShaderProgram*shaderProg, GLenum mode, size_t qdrnt);
-    void renderRenderablePoints(Renderable *obj, size_t startIndex, size_t endIndex, size_t qdrnt);
+    void renderRenderable(Renderable *obj, QOpenGLShaderProgram*shaderProg, GLenum mode);
+    void renderRenderablePoints(Renderable *obj, size_t startIndex, size_t endIndex);
 
     QOpenGLDebugLogger* debugLogger;
 

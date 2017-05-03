@@ -28,7 +28,6 @@ public:
     void dispVertInfo(unsigned short vertIndex);
     void dispHalfEdgeInfo(unsigned short edgeIndex);
     void dispFaceInfo(unsigned short faceIndex);
-    bool firstCC = true;
 };
 
 #endif // MESH_H

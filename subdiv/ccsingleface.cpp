@@ -13,14 +13,14 @@ OBJFile ccSingleFace(Mesh *inputMesh, size_t faceToBeRefined){
 
     size_t counter = 0;
     QString str;
-    for (size_t i = 0; i < inputMesh->Vertices.size(); ++i){
+    for (int i = 0; i < inputMesh->Vertices.size(); ++i){
         str.append(vtxToString(&inputMesh->Vertices[i]));
         str += QString("\n");
         ++counter;
     }
     str.append("s off\n");
-    for (size_t i = 0; i < inputMesh->Faces.size(); ++i){
-        if (not isNeighbour(&inputMesh->Faces[i], &inputMesh->Faces[faceToBeRefined]) && i != faceToBeRefined){
+    for (int i = 0; i < inputMesh->Faces.size(); ++i){
+        if (not isNeighbour(&inputMesh->Faces[i], &inputMesh->Faces[faceToBeRefined]) && size_t(i) != faceToBeRefined){
             str.append(faceToString(&inputMesh->Faces[i]));
             str += QString("\n");
             ++counter;
@@ -57,7 +57,7 @@ OBJFile ccSingleFace(Mesh *inputMesh, size_t faceToBeRefined){
     currentEdge = currentFace->side;
 
 
-    for (int i = 0; i < n; ++i){
+    for (size_t i = 0; i < n; ++i){
         str.append("f ");
         str.append(QString::number(numOldVerts + i + 1) + " ");
         str.append(QString::number(currentEdge->target->index + 1) + " ");

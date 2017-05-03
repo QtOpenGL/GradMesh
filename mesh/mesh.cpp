@@ -6,7 +6,6 @@ Mesh::Mesh() {
 
 Mesh::Mesh(OBJFile* loadedOBJFile) {
 
-
     // Convert loaded OBJ file to HalfEdge mesh
     size_t numVertices, numHalfEdges, numFaces;
     size_t k, m, n;

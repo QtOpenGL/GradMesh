@@ -49,7 +49,7 @@ void MouseHandler::mousePressEvent(QMouseEvent *event) {
 }
 
 void MouseHandler::mouseMoveEvent(QMouseEvent *event) {
-    if (type == NONE)
+    if (type == NONE || not isStarted)
         return;
 
     float xRatio, yRatio, xScene, yScene;

@@ -32,33 +32,20 @@ void MainView::createShaderPrograms() {
     mainShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
     mainShaderProg->link();
 
-    uniDx[0] = mainShaderProg->uniformLocation("dx");
-    uniDy[0] = mainShaderProg->uniformLocation("dy");
-    uniScale[0] = mainShaderProg->uniformLocation("scale");
-
     blackShaderProg = new QOpenGLShaderProgram();
     blackShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
     blackShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader_black.glsl");
     blackShaderProg->link();
-
-    uniDx[1] = blackShaderProg->uniformLocation("dx");
-    uniDy[1] = blackShaderProg->uniformLocation("dy");
-    uniScale[1] = blackShaderProg->uniformLocation("scale");
 
     whiteShaderProg = new QOpenGLShaderProgram();
     whiteShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
     whiteShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader_white.glsl");
     whiteShaderProg->link();
 
-    uniDx[2] = whiteShaderProg->uniformLocation("dx");
-    uniDy[2] = whiteShaderProg->uniformLocation("dy");
-    uniScale[2] = whiteShaderProg->uniformLocation("scale");
-
     greyShaderProg = new QOpenGLShaderProgram();
     greyShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
     greyShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader_grey.glsl");
     greyShaderProg->link();
-
 }
 
 void MainView::createBuffer(){
@@ -107,34 +94,31 @@ void MainView::initializeGL() {
     createBuffer();
 }
 
-void MainView::renderRenderable(Renderable *obj, QOpenGLShaderProgram *shaderProg, GLenum mode, size_t qdrnt){
+void MainView::renderRenderable(Renderable *obj, QOpenGLShaderProgram *shaderProg, GLenum mode){
     glBindVertexArray(obj->vao);
     if (mode == GL_POINTS){
         qDebug() << "Use renderRenderablePoints to render points";
         return;
     }
-    bindShader(shaderProg, qdrnt);
+    bindShader(shaderProg);
     glDrawElements(mode, obj->indices->size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     shaderProg->release();
     return;
 }
 
-void MainView::bindShader(QOpenGLShaderProgram *program, size_t qdrnt){
+void MainView::bindShader(QOpenGLShaderProgram *program){
     program->bind();
-    program->setUniformValue(uniDx[0], quadrantEntries[qdrnt][0]);
-    program->setUniformValue(uniDy[0], quadrantEntries[qdrnt][1]);
-    program->setUniformValue(uniScale[0], quadrantEntries[qdrnt][2]);
 }
 
-void MainView::renderRenderablePoints(Renderable *obj, size_t startIndex, size_t endIndex, size_t qdrnt){
+void MainView::renderRenderablePoints(Renderable *obj, size_t startIndex, size_t endIndex){
     glBindVertexArray(obj->vao);
 
-    bindShader(blackShaderProg, qdrnt);
+    bindShader(blackShaderProg);
     glPointSize(8.0);
     glDrawArrays(GL_POINTS, startIndex, endIndex);
 
-    bindShader(mainShaderProg, qdrnt);
+    bindShader(mainShaderProg);
     glPointSize(6.0);
     glDrawArrays(GL_POINTS, startIndex, endIndex);
     glBindVertexArray(0);
@@ -147,43 +131,55 @@ void MainView::paintGL() {
 
     Renderables *rndr = rndrbles;
 
-    if (not rndr){
+    if (not rndr)
         return;
-    }
 
     if (rndr->colourSurface->hasMesh() && showColourSurface){
         (static_cast<Renderable *>(rndr->colourSurface))->updateRenderable(this);
-        renderRenderable(static_cast<Renderable *>(rndr->colourSurface), mainShaderProg, GL_TRIANGLE_FAN, rndr->quadrant);
-        renderRenderable(static_cast<Renderable *>(rndr->colourSurface), greyShaderProg, GL_LINE_LOOP, rndr->quadrant);
+        renderRenderable(static_cast<Renderable *>(rndr->colourSurface), mainShaderProg, GL_TRIANGLE_FAN);
+
     }
 
     if (rndr->colourSurface->hasMesh() && showSkeleton){
         (static_cast<Renderable *>(rndr->colourSurface))->updateRenderable(this);
-        renderRenderable(static_cast<Renderable *>(rndr->colourSurface), blackShaderProg, GL_LINE_LOOP, rndr->quadrant);
-        renderRenderablePoints(static_cast<Renderable *>(rndr->colourSurface), 0, rndr->colourSurface->indices->size(), rndr->quadrant);
+        renderRenderable(static_cast<Renderable *>(rndr->colourSurface), blackShaderProg, GL_LINE_LOOP);
+        renderRenderablePoints(static_cast<Renderable *>(rndr->colourSurface), 0, rndr->colourSurface->indices->size());
     }
 
     if (rndr->controlMesh->hasMesh() && showControlNet){
         (static_cast<Renderable *>(rndr->controlMesh))->updateRenderable(this);
-        renderRenderable(static_cast<Renderable *>(rndr->controlMesh), blackShaderProg, GL_LINE_LOOP, rndr->quadrant);
+        renderRenderable(static_cast<Renderable *>(rndr->controlMesh), blackShaderProg, GL_LINE_LOOP);
+    }
+
+    if (rndr->refineMesh->hasMesh()  && showRefine){
+        (static_cast<Renderable *>(rndr->refineMesh))->updateRenderable(this);
+        renderRenderable(static_cast<Renderable *>(rndr->refineMesh), mainShaderProg, GL_LINE_LOOP);
+        int counter = -1;
+        if (mouseHandler->selectedFace != -1){
+            for (int i = 0; i <= mouseHandler->selectedFace; ++i){
+                counter += 2 * rndr->controlMesh->mesh->Faces[i].val + 1;
+            }
+            renderRenderablePoints(static_cast<Renderable *>(rndr->refineMesh), counter, 1);
+        }
     }
 
     if (rndr->skeletonMesh->hasMesh() && showGradients){
         (static_cast<Renderable *>(rndr->skeletonMesh))->updateRenderable(this);
-        renderRenderablePoints(static_cast<Renderable *>(rndr->skeletonMesh), 0, rndr->skeletonMesh->indices->size(), rndr->quadrant);
+        renderRenderablePoints(static_cast<Renderable *>(rndr->skeletonMesh), 0, rndr->skeletonMesh->indices->size());
     }
 
     int edgeIndex = mouseHandler->selectedEdge;
     if (edgeIndex != -1){
         (static_cast<Renderable *>(rndr->edgeRenderable))->updateRenderable(this);
-        renderRenderable(rndr->edgeRenderable, whiteShaderProg, GL_LINES, rndr->quadrant);
+        renderRenderable(rndr->edgeRenderable, whiteShaderProg, GL_LINES);
     }
 
     int faceIndex = mouseHandler->selectedFace;
     if (faceIndex != -1){
         (static_cast<Renderable *>(rndr->faceRenderable))->updateRenderable(this);
-        renderRenderable(rndr->faceRenderable, whiteShaderProg, GL_LINE_LOOP, rndr->quadrant);
+        renderRenderable(rndr->faceRenderable, whiteShaderProg, GL_LINE_LOOP);
     }
+
     update();
 }
 
