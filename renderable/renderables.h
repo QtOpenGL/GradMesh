@@ -22,12 +22,14 @@ public:
     QVector<Renderable *> *renderableList;
 
     Mesh *tMeshes[2];
+    Mesh *refMeshes[2];
     struct refiner {
         void (*meshRefiner)(Mesh *, Mesh *);
         REFINERS refinerID;
     };
     QVector <refiner> refiners;
 
+    void setRefineMeshColours();
     size_t cc_steps = 2;
     void updateEm();
     void init(OBJFile* loadedOBJFile);
