@@ -32,7 +32,7 @@ public:
 
     DISPLAY disp = DISPLAY::ORIGINAL;
 
-    QVector <Renderables *> *rndrbles;
+    Renderables *rndrbles;
     MouseHandler *mouseHandler;
 
     float quadrantEntries[5][3] = {
@@ -42,7 +42,7 @@ public:
         {0.5f, 0.5f, 0.5f},
         {-0.5f, 0.5f, 0.5f}
     };
-    void createBuffer(size_t index);
+    void createBuffer();
 
 protected:
     void initializeGL();

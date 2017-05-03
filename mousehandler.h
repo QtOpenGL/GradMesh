@@ -11,13 +11,13 @@ class MainView;
 class MouseHandler
 {
 public:
-    MouseHandler(QVector <Renderables *> *_rndrbles, MainView *_widget);
+    MouseHandler(Renderables *_rndrbles, MainView *_widget);
     int selectedPt = -1;
     int selectedFace = -1;
     int selectedEdge = -1;
     int height, width;
 
-    QVector <Renderables *> *rndrbles;
+    Renderables *rndrbles;
     short int rndrblesIndex = static_cast<size_t>(DISPLAY::ORIGINAL);
     void findQuadrant(float *_x, float *_y);
 

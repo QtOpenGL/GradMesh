@@ -7,7 +7,7 @@
 #include "utilities.h"
 
 
-MouseHandler::MouseHandler(QVector<Renderables *> *_rndrbles, MainView *_mainview)
+MouseHandler::MouseHandler(Renderables *_rndrbles, MainView *_mainview)
   : rndrbles(_rndrbles),
     mainview(_mainview)
 {
@@ -42,10 +42,10 @@ void MouseHandler::mousePressEvent(QMouseEvent *event) {
             break;
         QColor c = QColorDialog::getColor(Qt::white, static_cast<QWidget*>(mainview));
         if (c.isValid()){
-            (*rndrbles)[rndrblesIndex]->controlMesh->mesh->Vertices[selectedPt].colour = QVector3D(c.redF(), c.greenF(), c.blueF());
-            (*rndrbles)[rndrblesIndex]->controlMesh->fillColours();
+            rndrbles->controlMesh->mesh->Vertices[selectedPt].colour = QVector3D(c.redF(), c.greenF(), c.blueF());
+            rndrbles->controlMesh->fillColours();
 
-            (*rndrbles)[rndrblesIndex]->updateEm();
+            rndrbles->updateEm();
       }
       break;
     }
@@ -53,7 +53,7 @@ void MouseHandler::mousePressEvent(QMouseEvent *event) {
 
 void MouseHandler::findQuadrant(float *_x, float *_y) {
 
-    if ((*rndrbles)[0]){
+    if (rndrbles){
         rndrblesIndex = 0;
         return;
     }
@@ -71,7 +71,7 @@ void MouseHandler::findQuadrant(float *_x, float *_y) {
             qdrnt = 1;
     }
 
-    if (not (*rndrbles)[qdrnt]){
+    if (not rndrbles){
         rndrblesIndex = -1;
         return;
     }
@@ -105,16 +105,16 @@ void MouseHandler::mouseMoveEvent(QMouseEvent *event) {
     if (selectType == POINTS){
         if (type == CONTROL){
             // Update position of the control point
-            (*rndrbles)[rndrblesIndex]->controlMesh->mesh->Vertices[selectedPt].coords = QVector2D(xScene, yScene);
-            (*rndrbles)[rndrblesIndex]->controlMesh->fillCoords();
-            (*rndrbles)[rndrblesIndex]->skeletonMesh->fillCoords();
+            rndrbles->controlMesh->mesh->Vertices[selectedPt].coords = QVector2D(xScene, yScene);
+            rndrbles->controlMesh->fillCoords();
+            rndrbles->skeletonMesh->fillCoords();
         } else if (type == GRADIENT){
-            HalfEdge *currentEdge = &((*rndrbles)[rndrblesIndex])->controlMesh->mesh->HalfEdges[selectedPt];
-            currentEdge->colGrad = QVector2D(xScene, yScene) - (*rndrbles)[rndrblesIndex]->controlMesh->mesh->Vertices[currentEdge->twin->target->index].coords;
-            (*rndrbles)[rndrblesIndex]->skeletonMesh->fillCoords();
+            HalfEdge *currentEdge = &(rndrbles)->controlMesh->mesh->HalfEdges[selectedPt];
+            currentEdge->colGrad = QVector2D(xScene, yScene) - rndrbles->controlMesh->mesh->Vertices[currentEdge->twin->target->index].coords;
+            rndrbles->skeletonMesh->fillCoords();
         }
 
-        (*rndrbles)[rndrblesIndex]->updateEm();
+        rndrbles->updateEm();
     }
 }
 
@@ -124,8 +124,8 @@ short int MouseHandler::findClosestPoint(float _x, float _y) {
     float currentDist, minDist = 1;
 
     type = NONE;
-    for (size_t k = 0; k < (size_t)(*rndrbles)[rndrblesIndex]->skeletonMesh->coords->size(); k++) {
-        currentDist = pow(((*rndrbles)[rndrblesIndex]->skeletonMesh->coords->at(k)[0] - _x),2) + pow(( (*rndrbles)[rndrblesIndex]->skeletonMesh->coords->at(k)[1] - _y),2);
+    for (size_t k = 0; k < (size_t)(rndrbles->skeletonMesh->coords->size()); k++) {
+        currentDist = pow((rndrbles->skeletonMesh->coords->at(k)[0] - _x),2) + pow(( rndrbles->skeletonMesh->coords->at(k)[1] - _y),2);
         if (currentDist < minDist) {
             minDist = currentDist;
             ptIndex = k;
@@ -138,16 +138,16 @@ short int MouseHandler::findClosestPoint(float _x, float _y) {
     }
 
     size_t vertIndex = 0;
-    while (ptIndex >= (*rndrbles)[rndrblesIndex]->skeletonMesh->mesh->Vertices[vertIndex].val + 1){
-        ptIndex -= 1 + (*rndrbles)[rndrblesIndex]->skeletonMesh->mesh->Vertices[vertIndex].val;
+    while (ptIndex >= rndrbles->skeletonMesh->mesh->Vertices[vertIndex].val + 1){
+        ptIndex -= 1 + rndrbles->skeletonMesh->mesh->Vertices[vertIndex].val;
         vertIndex++;
     }
     type = ptIndex == 0 ? CONTROL : GRADIENT;
 
     if (ptIndex == 0)
-        return (*rndrbles)[rndrblesIndex]->skeletonMesh->mesh->Vertices[vertIndex].index;
+        return rndrbles->skeletonMesh->mesh->Vertices[vertIndex].index;
 
-    HalfEdge *currentEdge = (*rndrbles)[rndrblesIndex]->skeletonMesh->mesh->Vertices[vertIndex].out;
+    HalfEdge *currentEdge = rndrbles->skeletonMesh->mesh->Vertices[vertIndex].out;
     while (ptIndex != 1){
         currentEdge = currentEdge->prev->twin;
         --ptIndex;
@@ -189,8 +189,8 @@ short int MouseHandler::findClosestFace(float _x, float _y) {
     float dist;
     int minIndex = -1;
     Face* currentFace;
-    for (int i = 0; i < (*rndrbles)[rndrblesIndex]->skeletonMesh->mesh->Faces.size(); ++i){
-        currentFace = &(*rndrbles)[rndrblesIndex]->skeletonMesh->mesh->Faces[i];
+    for (int i = 0; i < rndrbles->skeletonMesh->mesh->Faces.size(); ++i){
+        currentFace = &rndrbles->skeletonMesh->mesh->Faces[i];
         dist = (centroid(currentFace) - point).lengthSquared();
         if (dist < minDist){
             minDist = dist;
@@ -199,7 +199,7 @@ short int MouseHandler::findClosestFace(float _x, float _y) {
     }
 
     if (minIndex != -1)
-        buildFaceRenderable(minIndex, (*rndrbles)[rndrblesIndex]);
+        buildFaceRenderable(minIndex, rndrbles);
 
     return minIndex;
 }
@@ -211,8 +211,8 @@ short int MouseHandler::findClosestEdge(float _x, float _y) {
     short int minIndex = -1;
     HalfEdge* currentEdge;
 
-    for (unsigned int i = 0; i < (unsigned int)(*rndrbles)[rndrblesIndex]->skeletonMesh->mesh->HalfEdges.size(); ++i){
-        currentEdge = &(*rndrbles)[rndrblesIndex]->skeletonMesh->mesh->HalfEdges[i];
+    for (unsigned int i = 0; i < (unsigned int)rndrbles->skeletonMesh->mesh->HalfEdges.size(); ++i){
+        currentEdge = &rndrbles->skeletonMesh->mesh->HalfEdges[i];
         dist = distToLine(point, currentEdge->start(), currentEdge->end());
         if (dist < minDist){
             minDist = dist;
@@ -220,7 +220,7 @@ short int MouseHandler::findClosestEdge(float _x, float _y) {
         }
     }
     if (minIndex != -1)
-        buildEdgeRenderable(minIndex, (*rndrbles)[rndrblesIndex]);
+        buildEdgeRenderable(minIndex, rndrbles);
 
     return minIndex;
 }

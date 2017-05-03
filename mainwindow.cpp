@@ -19,8 +19,8 @@ MainWindow::~MainWindow() {
 void MainWindow::on_ImportOBJ_clicked() {
     OBJFile newModel = OBJFile(QFileDialog::getOpenFileName(this, "Import OBJ File", "../../CAD2/CAD/models/", tr("Obj Files (*.obj)")));
 
-    delete ((*ui->mainView->rndrbles)[0])->controlMesh->mesh;
-    ((*ui->mainView->rndrbles)[0])->init(&newModel);
+    delete ui->mainView->rndrbles->controlMesh->mesh;
+    ui->mainView->rndrbles->init(&newModel);
     ui->mainView->updateBuffers();
     ui->mainView->mouseHandler->isStarted = true;
 }
@@ -72,13 +72,13 @@ void MainWindow::on_gradSlider_valueChanged(int value)
     if (index == -1)
         return;
 
-    QVector<HalfEdge> *HalfEdges = &((*ui->mainView->rndrbles)[index]->controlMesh->mesh->HalfEdges);
+    QVector<HalfEdge> *HalfEdges = &(ui->mainView->rndrbles->controlMesh->mesh->HalfEdges);
     HalfEdge *currentEdge;
     for (int i = 0; i < HalfEdges->size(); ++i){
         currentEdge = &(*HalfEdges)[i];
         currentEdge->colGrad = ratio * (currentEdge->target->coords - currentEdge->twin->target->coords);
     }
-    ((*ui->mainView->rndrbles)[index])->updateEm();
+    ui->mainView->rndrbles->updateEm();
 }
 
 void MainWindow::on_refineFacePB_clicked()
@@ -89,14 +89,14 @@ void MainWindow::on_refineFacePB_clicked()
         return;
     }
     OBJFile obj =  ccSingleFace(
-                (*ui->mainView->rndrbles)[currentMesh]->controlMesh->mesh,
+                ui->mainView->rndrbles->controlMesh->mesh,
                 ui->mainView->mouseHandler->selectedFace
                 );
 
 //    qDebug() << obj.vertexCoords;
     currentMesh++;
-    (*ui->mainView->rndrbles)[currentMesh]->controlMesh->mesh = new Mesh;
-    (*ui->mainView->rndrbles)[currentMesh]->init(&obj);
+    ui->mainView->rndrbles->controlMesh->mesh = new Mesh;
+    ui->mainView->rndrbles->init(&obj);
 }
 
 void MainWindow::on_methodLE_editingFinished()
@@ -109,7 +109,7 @@ void MainWindow::on_methodLE_editingFinished()
         return;
 
     QString text = ui->methodLE->text();
-    Renderables *rndrable = (*ui->mainView->rndrbles)[index];
+    Renderables *rndrable = ui->mainView->rndrbles;
 
     rndrable->refiners.clear();
     rndrable->refiners.squeeze();
@@ -129,8 +129,8 @@ void MainWindow::on_ImportTRI_clicked()
 {
     OBJFile newModel = OBJFile("../../CAD2/CAD/models/tri1.obj");
 
-    delete ((*ui->mainView->rndrbles)[0])->controlMesh->mesh;
-    ((*ui->mainView->rndrbles)[0])->init(&newModel);
+    delete ui->mainView->rndrbles->controlMesh->mesh;
+    ui->mainView->rndrbles->init(&newModel);
 
     ui->mainView->updateBuffers();
     ui->mainView->mouseHandler->isStarted = true;
@@ -148,14 +148,14 @@ void MainWindow::on_makeNGonPB_clicked()
 {
     OBJFile obj = makeNGON(5);
     currentMesh++;
-    (*ui->mainView->rndrbles)[currentMesh]->controlMesh->mesh = new Mesh;
-    (*ui->mainView->rndrbles)[currentMesh]->init(&obj);
+    ui->mainView->rndrbles->controlMesh->mesh = new Mesh;
+    ui->mainView->rndrbles->init(&obj);
 
 }
 
 void MainWindow::on_toStringPB_clicked()
 {
-    Mesh *mesh =  ((*ui->mainView->rndrbles)[size_t(ui->mainView->disp)])->colourSurface->mesh;
+    Mesh *mesh = ui->mainView->rndrbles->colourSurface->mesh;
     QString str;
     Vertex *vtx;
     Face *face;
@@ -180,7 +180,7 @@ void MainWindow::on_toStringPB_clicked()
 
 void MainWindow::on_toNewMeshPB_clicked()
 {
-    Mesh *mesh =  ((*ui->mainView->rndrbles)[size_t(ui->mainView->disp)])->colourSurface->mesh;
+    Mesh *mesh = ui->mainView->rndrbles->colourSurface->mesh;
     QString str;
     Vertex *vtx;
     Face *face;
@@ -209,5 +209,5 @@ void MainWindow::on_toNewMeshPB_clicked()
     OBJFile obj("output.txt");
 
 
-    (*ui->mainView->rndrbles)[size_t(ui->mainView->disp)]->init(&obj);
+    ui->mainView->rndrbles->init(&obj);
 }

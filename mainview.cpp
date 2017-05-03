@@ -4,12 +4,10 @@
 
 MainView::MainView(QWidget *parent)
     : QOpenGLWidget(parent)
-    , rndrbles(new QVector<Renderables *> (10 ,nullptr))
+    , rndrbles(new Renderables)
     , mouseHandler( new MouseHandler(rndrbles, this) )
 {
     qDebug() << "✓✓ MainView constructor";
-    for (size_t i = 0; i < 10; ++i)
-        (*rndrbles)[i] = new Renderables;
 
     mouseHandler->width = width();
     mouseHandler->height = height();
@@ -63,9 +61,9 @@ void MainView::createShaderPrograms() {
 
 }
 
-void MainView::createBuffer(size_t index){
-    for (size_t i = 0; i < static_cast<size_t>((*rndrbles)[index]->renderableList->size()); ++i)
-        ( (*((*rndrbles)[index])->renderableList)[i])->registerRenderable(this);
+void MainView::createBuffer(){
+    for (size_t i = 0; i < static_cast<size_t>(rndrbles->renderableList->size()); ++i)
+        (*rndrbles->renderableList)[i]->registerRenderable(this);
 }
 
 void MainView::updateBuffers() {
@@ -106,8 +104,7 @@ void MainView::initializeGL() {
     glPrimitiveRestartIndex(maxInt);
 
     createShaderPrograms();
-    for (size_t i = 0; i < 10; ++i)
-        createBuffer(i);
+    createBuffer();
 }
 
 void MainView::renderRenderable(Renderable *obj, QOpenGLShaderProgram *shaderProg, GLenum mode, size_t qdrnt){
@@ -148,10 +145,7 @@ void MainView::paintGL() {
     glClearColor(1.0, 1.0, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    Renderables *rndr =
-            disp == DISPLAY::ORIGINAL ? (*rndrbles)[0] :
-            disp == DISPLAY::MESHREF ? (*rndrbles)[1] :
-            disp == DISPLAY::CTRLVECTOR ? (*rndrbles)[2] : nullptr;
+    Renderables *rndr = rndrbles;
 
     if (not rndr){
         return;
