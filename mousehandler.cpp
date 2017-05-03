@@ -26,9 +26,6 @@ void MouseHandler::mousePressEvent(QMouseEvent *event) {
     xScene = 2 * xRatio - 1;
     yScene = 1 - 2 * yRatio;
 
-//    findQuadrant(&xScene, &yScene);
-
-    rndrblesIndex = static_cast<short int>(mainview->disp);
 
     switch (event->buttons()) {
     case Qt::LeftButton:
@@ -51,40 +48,8 @@ void MouseHandler::mousePressEvent(QMouseEvent *event) {
     }
 }
 
-void MouseHandler::findQuadrant(float *_x, float *_y) {
-
-    if (rndrbles){
-        rndrblesIndex = 0;
-        return;
-    }
-    size_t qdrnt;
-    if (*_x > 0.0){
-        if (*_y < 0.0)
-            qdrnt = 4;
-        else
-            qdrnt = 2;
-    }
-    else {
-        if (*_y < 0.0)
-            qdrnt = 3;
-        else
-            qdrnt = 1;
-    }
-
-    if (not rndrbles){
-        rndrblesIndex = -1;
-        return;
-    }
-    rndrblesIndex = qdrnt;
-
-    *_x += mainview->quadrantEntries[qdrnt][0];
-    *_y += mainview->quadrantEntries[qdrnt][1];
-    *_x /= mainview->quadrantEntries[qdrnt][2];
-    *_y /= mainview->quadrantEntries[qdrnt][2];
-}
-
 void MouseHandler::mouseMoveEvent(QMouseEvent *event) {
-    if (type == NONE || rndrblesIndex == -1)
+    if (type == NONE)
         return;
 
     float xRatio, yRatio, xScene, yScene;
@@ -94,13 +59,6 @@ void MouseHandler::mouseMoveEvent(QMouseEvent *event) {
 
     xScene = (1-xRatio)*-1 + xRatio*1;
     yScene = yRatio*-1 + (1-yRatio)*1;
-
-//    xScene += mainview->quadrantEntries[rndrblesIndex][0];
-//    yScene += mainview->quadrantEntries[rndrblesIndex][1];
-//    xScene /= mainview->quadrantEntries[rndrblesIndex][2];
-//    yScene /= mainview->quadrantEntries[rndrblesIndex][2];
-
-    // Maybe here some code that prevents user from dragging point outside of the quadrant
 
     if (selectType == POINTS){
         if (type == CONTROL){
@@ -113,7 +71,6 @@ void MouseHandler::mouseMoveEvent(QMouseEvent *event) {
             currentEdge->colGrad = QVector2D(xScene, yScene) - rndrbles->controlMesh->mesh->Vertices[currentEdge->twin->target->index].coords;
             rndrbles->skeletonMesh->fillCoords();
         }
-
         rndrbles->updateEm();
     }
 }

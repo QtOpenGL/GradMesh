@@ -68,9 +68,6 @@ void MainWindow::on_gradSlider_valueChanged(int value)
         return;
 
     float ratio = (float) value / 100.0f;
-    short int index = ui->mainView->mouseHandler->rndrblesIndex;
-    if (index == -1)
-        return;
 
     QVector<HalfEdge> *HalfEdges = &(ui->mainView->rndrbles->controlMesh->mesh->HalfEdges);
     HalfEdge *currentEdge;
@@ -134,14 +131,6 @@ void MainWindow::on_ImportTRI_clicked()
 
     ui->mainView->updateBuffers();
     ui->mainView->mouseHandler->isStarted = true;
-}
-
-
-void MainWindow::on_spinBox_valueChanged(int arg1)
-{
-    if (arg1 < static_cast<int>(DISPLAY::NUMDISPLAYS))
-        ui->mainView->disp = static_cast<DISPLAY>(arg1);
-    ui->mainView->update();
 }
 
 void MainWindow::on_makeNGonPB_clicked()

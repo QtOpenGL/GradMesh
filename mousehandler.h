@@ -18,8 +18,6 @@ public:
     int height, width;
 
     Renderables *rndrbles;
-    short int rndrblesIndex = static_cast<size_t>(DISPLAY::ORIGINAL);
-    void findQuadrant(float *_x, float *_y);
 
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
