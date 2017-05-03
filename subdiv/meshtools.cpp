@@ -4,8 +4,6 @@ float max(double a, double b){
     return a > b ? a : b;
 }
 
-// ---
-
 VertInfo vertexPoint(HalfEdge* firstEdge, Mesh* subdivMesh) {
     // This functions handels vertices with (possibly fractional) sharpness.
 
@@ -35,7 +33,7 @@ VertInfo vertexPoint(HalfEdge* firstEdge, Mesh* subdivMesh) {
 
   // At this point, vertexPt is the sum of the vertices connected to currentVertex by sharp edges.
   if (incidentCreases >= 3){ // Vertex is a corner
-//      VertInfo vt(currentVertex->coords, currentVertex->colour);
+  // VertInfo vt(currentVertex->coords, currentVertex->colour);
       return VertInfo(currentVertex);
   }
   if (incidentCreases == 2){

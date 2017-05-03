@@ -2,6 +2,8 @@
 
 void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
 
+  subdivMesh->firstCC = false;
+
   unsigned int numVerts, numHalfEdges, numFaces, sumFaceValences;
   unsigned int k, m, s, t;
   unsigned int vIndex, hIndex, fIndex;
@@ -51,17 +53,19 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
   vIndex = numFaces;
   // Create vertex points
   for (k=0; k<numVerts; k++) {
-    n = inputMesh->Vertices[k].val;
-    newVert = vertexPoint(inputMesh->Vertices[k].out, subdivMesh);
-    // Coords (x,y), Out, Valence, Index
-    subdivMesh->Vertices.append( Vertex(newVert.pos,
-                                        nullptr,
-                                        n,
-                                        vIndex,
-                                        0,
-                                        newVert.col) );
-    vIndex++;
-  }
+      n = inputMesh->Vertices[k].val;
+      newVert = vertexPoint(inputMesh->Vertices[k].out, subdivMesh);
+
+      QVector2D newPos = inputMesh->firstCC ? inputMesh->Vertices[k].coords : newVert.pos;
+
+      subdivMesh->Vertices.append( Vertex(newVert.pos,
+                                          nullptr,
+                                          n,
+                                          vIndex,
+                                          0,
+                                          newVert.col) );
+      vIndex++;
+    }
 
 //  qDebug() << " * Created vertex points";
 

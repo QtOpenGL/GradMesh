@@ -28,7 +28,7 @@ public:
     bool showColourSurface = true;
     bool showSkeleton = false;
 
-    QOpenGLShaderProgram* mainShaderProg,* blackShaderProg,* whiteShaderProg;
+    QOpenGLShaderProgram* mainShaderProg,* blackShaderProg,* whiteShaderProg,* greyShaderProg;
 
     DISPLAY disp = DISPLAY::ORIGINAL;
 

@@ -56,6 +56,10 @@ void MainView::createShaderPrograms() {
     uniDy[2] = whiteShaderProg->uniformLocation("dy");
     uniScale[2] = whiteShaderProg->uniformLocation("scale");
 
+    greyShaderProg = new QOpenGLShaderProgram();
+    greyShaderProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
+    greyShaderProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader_grey.glsl");
+    greyShaderProg->link();
 
 }
 
@@ -156,6 +160,7 @@ void MainView::paintGL() {
     if (rndr->colourSurface->hasMesh() && showColourSurface){
         (static_cast<Renderable *>(rndr->colourSurface))->updateRenderable(this);
         renderRenderable(static_cast<Renderable *>(rndr->colourSurface), mainShaderProg, GL_TRIANGLE_FAN, rndr->quadrant);
+        renderRenderable(static_cast<Renderable *>(rndr->colourSurface), greyShaderProg, GL_LINE_LOOP, rndr->quadrant);
     }
 
     if (rndr->colourSurface->hasMesh() && showSkeleton){
