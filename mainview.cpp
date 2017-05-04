@@ -153,7 +153,7 @@ void MainView::paintGL() {
 
     if (rndr->refineMesh->hasMesh()  && showRefine){
         (static_cast<Renderable *>(rndr->refineMesh))->updateRenderable(this);
-        renderRenderable(static_cast<Renderable *>(rndr->refineMesh), mainShaderProg, GL_LINE_LOOP);
+        renderRenderable(static_cast<Renderable *>(rndr->refineMesh), mainShaderProg, GL_TRIANGLE_FAN);
         int counter = -1;
         if (mouseHandler->selectedFace != -1){
             for (int i = 0; i <= mouseHandler->selectedFace; ++i){

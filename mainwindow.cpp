@@ -95,28 +95,6 @@ void MainWindow::on_refineFacePB_clicked()
     ui->mainView->rndrbles->init(&obj);
 }
 
-void MainWindow::on_methodLE_editingFinished()
-{
-    if (not ui->mainView->mouseHandler->isStarted)
-        return;
-
-    QString text = ui->methodLE->text();
-    Renderables *rndrable = ui->mainView->rndrbles;
-
-    rndrable->refiners.clear();
-    rndrable->refiners.squeeze();
-
-    for (unsigned int letter = 0; letter < static_cast<unsigned int>(text.size()); ++letter){
-        if (text[letter] == 'T' || text[letter] == 't')
-            rndrable->refiners.append({&ternaryStep, TERNARY});
-        else if (text[letter] == 'C' || text[letter] == 'c')
-            rndrable->refiners.append({&subdivideCatmullClark, CATMULLCLARK});
-        else
-            qDebug() << "Invalid input";
-    }
-    rndrable->updateEm();
-}
-
 void MainWindow::on_ImportTRI_clicked()
 {
     OBJFile newModel = OBJFile("../../CAD2/CAD/models/tri1.obj");

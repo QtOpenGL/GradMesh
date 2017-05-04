@@ -74,7 +74,7 @@
       <widget class="QCheckBox" name="gradientCB">
        <property name="geometry">
         <rect>
-         <x>15</x>
+         <x>10</x>
          <y>220</y>
          <width>156</width>
          <height>22</height>
@@ -90,7 +90,7 @@
       <widget class="QCheckBox" name="controlNetCB">
        <property name="geometry">
         <rect>
-         <x>15</x>
+         <x>10</x>
          <y>250</y>
          <width>171</width>
          <height>22</height>
@@ -106,7 +106,7 @@
       <widget class="QCheckBox" name="colourSurfaceCB">
        <property name="geometry">
         <rect>
-         <x>15</x>
+         <x>10</x>
          <y>280</y>
          <width>151</width>
          <height>22</height>
@@ -182,7 +182,7 @@
       <widget class="QCheckBox" name="skeletonCB">
        <property name="geometry">
         <rect>
-         <x>15</x>
+         <x>10</x>
          <y>340</y>
          <width>87</width>
          <height>22</height>
@@ -259,12 +259,12 @@
         <rect>
          <x>10</x>
          <y>310</y>
-         <width>97</width>
+         <width>171</width>
          <height>22</height>
         </rect>
        </property>
        <property name="text">
-        <string>CheckBox</string>
+        <string>Refined Mesh</string>
        </property>
       </widget>
      </widget>

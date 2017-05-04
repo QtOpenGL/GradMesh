@@ -25,7 +25,6 @@ private slots:
     void on_gradSlider_valueChanged(int value);
     void on_refineFacePB_clicked();
     void on_skeletonCB_toggled(bool checked);
-    void on_methodLE_editingFinished();
     void on_ImportTRI_clicked();
     void on_makeNGonPB_clicked();
     void on_toStringPB_clicked();

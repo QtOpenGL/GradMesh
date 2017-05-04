@@ -174,7 +174,8 @@ void Mesh::copy(Mesh *mesh){
 
 
     for (size_t es = 0; es < numEdges; ++es){
-//HalfEdge(Vertex* htarget, HalfEdge* hnext, HalfEdge* hprev, HalfEdge* htwin, Face* hpolygon, unsigned int hindex, float hsharpness=0, QVector2D hcolGrad = QVector2D(0.0, 0.0)) {
+//HalfEdge(Vertex* htarget, HalfEdge* hnext, HalfEdge* hprev, HalfEdge* htwin, Face* hpolygon,
+        //unsigned int hindex, float hsharpness=0, QVector2D hcolGrad = QVector2D(0.0, 0.0)) {
         currentEdge = &mesh->HalfEdges[es];
         HalfEdges.append(HalfEdge(
                              nullptr,
@@ -322,7 +323,8 @@ void Mesh::dispVertInfo(unsigned short vertIndex) {
 
 void Mesh::dispHalfEdgeInfo(unsigned short edgeIndex) {
   HalfEdge* dispEdge = &HalfEdges[edgeIndex];
-  qDebug() << "HalfEdge at Index =" << dispEdge->index << "Target =" << dispEdge->target << "Next =" << dispEdge->next << "Prev =" << dispEdge->prev << "Twin =" << dispEdge->twin << "Poly =" << dispEdge->polygon;
+  qDebug() << "HalfEdge at Index =" << dispEdge->index << "Target =" << dispEdge->target <<
+              "Next =" << dispEdge->next << "Prev =" << dispEdge->prev << "Twin =" << dispEdge->twin << "Poly =" << dispEdge->polygon;
 }
 
 void Mesh::dispFaceInfo(unsigned short faceIndex){

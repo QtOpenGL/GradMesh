@@ -23,12 +23,7 @@ public:
 
     Mesh *tMeshes[2];
     Mesh *refMeshes[2];
-    struct refiner {
-        void (*meshRefiner)(Mesh *, Mesh *);
-        REFINERS refinerID;
-    };
-    QVector <refiner> refiners;
-
+    size_t ccSteps = 2;
     void setRefineMeshColours();
     size_t cc_steps = 2;
     void updateEm();

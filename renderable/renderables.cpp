@@ -24,8 +24,6 @@ Renderables::Renderables()
     renderableList->append(edgeRenderable);
     renderableList->append(faceRenderable);
 
-    refiners.append({&ternaryStep, TERNARY});
-    refiners.append({&subdivideCatmullClark, CATMULLCLARK});
 }
 
 Renderables::~Renderables(){
@@ -75,6 +73,20 @@ void Renderables::init(){
     *edgeRenderable->indices = QVector<unsigned int> {0, 1};
 }
 
+QVector3D limitPoint(Vertex *vtx){
+    QVector3D result = QVector3D(0.0, 0.0, 0.0);
+    HalfEdge *currentEdge = vtx->out;
+    size_t n = vtx->val;
+    for (size_t i = 0; i < n; ++i){
+        result += 4 * currentEdge->target->colour;
+        result += currentEdge->next->target->colour;
+        currentEdge = currentEdge->prev->twin;
+    }
+    // 4 * edges + faces
+    result += n * n * vtx->colour;
+    return (result / (n * (n + 5)));
+
+}
 
 void Renderables::setRefineMeshColours(){
     int counter = -1;
@@ -85,15 +97,19 @@ void Renderables::setRefineMeshColours(){
         currentFace = &controlMesh->mesh->Faces[i];
         counter += 2 * currentFace->val + 1;
         currentVertex = &refineMesh->mesh->Vertices[counter];
-        currentVertex->colour = QVector3D(0.0, 1.0, 0.0);
+//        QVector3D r0 = limitPoint(&colourSurface->mesh->Vertices[counter]);
+//        float r0 = colourSurface->mesh->Vertices[counter].colour[1];
+//        r0 = 0.9;
+//        qDebug() << r0;
         currentEdge = currentVertex->out;
         for (int k = 0; k < currentVertex->val; ++k){
             for (int j = 0; j < currentEdge->polygon->val; ++j){
-                currentEdge->target->colour = QVector3D(0.0, 1.0, 0.0);
+                currentEdge->target->colour = QVector3D(1.0, 1.0, 1.0);
                 currentEdge = currentEdge->next;
             }
             currentEdge = currentEdge->prev->twin;
         }
+        currentVertex->colour = QVector3D(1.0, 1.0, 1.0);
     }
 }
 
@@ -105,8 +121,12 @@ void Renderables::updateEm(){
 
     size_t tIndex = 1;
 
-    for (size_t refIndex = 0; refIndex < static_cast<size_t>(refiners.size()); ++refIndex){
-        refiners[refIndex].meshRefiner(tMeshes[1 - tIndex], tMeshes[tIndex]);
+    ternaryStep(tMeshes[1 - tIndex], tMeshes[tIndex]);
+    tIndex = 1 - tIndex;
+    tMeshes[tIndex] = new Mesh;
+
+    for (size_t refIndex = 0; refIndex < ccSteps; ++refIndex){
+        subdivideCatmullClark(tMeshes[1 - tIndex], tMeshes[tIndex]);
         tIndex = 1 - tIndex;
         tMeshes[tIndex] = new Mesh;
     }
@@ -125,10 +145,9 @@ void Renderables::updateEm(){
     setRefineMeshColours();
     refMeshes[0] = refineMesh->mesh;
     refMeshes[1] = new Mesh;
-
     tIndex = 1;
-    for (size_t refIndex = 2; refIndex < static_cast<size_t>(refiners.size()); ++refIndex){
-        refiners[refIndex].meshRefiner(refMeshes[1 - tIndex], refMeshes[tIndex]);
+    for (size_t refIndex = 1; refIndex < ccSteps; ++refIndex){
+        subdivideCatmullClark(refMeshes[1 - tIndex], refMeshes[tIndex]);
         tIndex = 1 - tIndex;
         refMeshes[tIndex] = new Mesh;
     }
@@ -137,20 +156,19 @@ void Renderables::updateEm(){
     refineMesh->fillCoords();
     refineMesh->fillColours();
 
-
     assert(colourSurface->mesh->Vertices.size() == refineMesh->mesh->Vertices.size());
 
-    float gamma = 1.0f;
-    float gamma_recip;
     for (int i = 0; i < colourSurface->mesh->Vertices.size(); ++i){
-        gamma_recip = 1.0f / gamma;
-        colourSurface->mesh->Vertices[i].colour += gamma_recip * (QVector3D(1.0, 1.0, 1.0) -  colourSurface->mesh->Vertices[i].colour) * refineMesh->mesh->Vertices[i].colour ;
+        colourSurface->mesh->Vertices[i].colour += (QVector3D(1.0, 1.0, 1.0) -  colourSurface->mesh->Vertices[i].colour) * refineMesh->mesh->Vertices[i].colour;
+        if (colourSurface->mesh->Vertices[i].colour[0] > 1.0f ||
+                colourSurface->mesh->Vertices[i].colour[1] > 1.0f ||
+                colourSurface->mesh->Vertices[i].colour[2] > 1.0f )
+            qDebug() << colourSurface->mesh->Vertices[i].colour[0];
     }
 
 
     colourSurface->fillCoords();
     colourSurface->fillColours();
-
 
     return;
 }
