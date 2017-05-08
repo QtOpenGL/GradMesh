@@ -179,23 +179,26 @@ void Renderables::updateEm(){
     assert(colourSurface->mesh->Vertices.size() == refineMesh->mesh->Vertices.size());
 
 
-    Face *currentFace;
-    for (int i = 0; i < controlMesh->mesh->Faces.size(); ++i){
-        currentFace = &controlMesh->mesh->Faces[i];
-        counter += 2 * currentFace->val + 1;
-        if (not currentFace->colControl)
-            continue;
-        colourSurface->mesh->Vertices[counter].colour = limitPoint(&colourSurface->mesh->Vertices[counter]);
+//    Face *currentFace;
+//    for (int i = 0; i < controlMesh->mesh->Faces.size(); ++i){
+//        currentFace = &controlMesh->mesh->Faces[i];
+//        counter += 2 * currentFace->val + 1;
+//        if (not currentFace->colControl)
+//            continue;
+//        colourSurface->mesh->Vertices[counter].colour = QVector3D(0.0, 0.0, 0.0);
 
-    }
-
-//    for (int i = 0; i < colourSurface->mesh->Vertices.size(); ++i){
-//        colourSurface->mesh->Vertices[i].colour += (QVector3D(1.0, 1.0, 1.0) -  colourSurface->mesh->Vertices[i].colour) * refineMesh->mesh->Vertices[i].colour;
-//        if (colourSurface->mesh->Vertices[i].colour[0] > 1.0f ||
-//                colourSurface->mesh->Vertices[i].colour[1] > 1.0f ||
-//                colourSurface->mesh->Vertices[i].colour[2] > 1.0f )
-//            qDebug() << colourSurface->mesh->Vertices[i].colour;
 //    }
+
+    for (int i = 0; i < colourSurface->mesh->Vertices.size(); ++i){
+        colourSurface->mesh->Vertices[i].colour += (QVector3D(1.0, 1.0, 1.0) -  colourSurface->mesh->Vertices[i].colour) * refineMesh->mesh->Vertices[i].colour;
+        if (colourSurface->mesh->Vertices[i].colour[0] > 1.0f ||
+                colourSurface->mesh->Vertices[i].colour[1] > 1.0f ||
+                colourSurface->mesh->Vertices[i].colour[2] > 1.0f ||
+                colourSurface->mesh->Vertices[i].colour[0] < 0.0f ||
+                colourSurface->mesh->Vertices[i].colour[2] < 0.0f ||
+                colourSurface->mesh->Vertices[i].colour[1] < 0.0f)
+            qDebug() << colourSurface->mesh->Vertices[i].colour;
+    }
 
     colourSurface->fillCoords();
     colourSurface->fillColours();
