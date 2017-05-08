@@ -109,8 +109,9 @@ void MainWindow::on_ImportTRI_clicked()
 void MainWindow::on_makeNGonPB_clicked()
 {
     OBJFile obj = makeNGON(5);
-    ui->mainView->rndrbles->controlMesh->mesh = new Mesh;
+    delete ui->mainView->rndrbles->controlMesh->mesh;
     ui->mainView->rndrbles->init(&obj);
+    ui->mainView->updateBuffers();
 }
 
 void MainWindow::on_toStringPB_clicked()

@@ -85,7 +85,6 @@ QVector3D limitPoint(Vertex *vtx){
     // 4 * edges + faces
     result += n * n * vtx->colour;
     return (result / (n * (n + 5)));
-
 }
 
 void Renderables::setRefineMeshColours(){

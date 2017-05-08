@@ -7,7 +7,7 @@ OBJFile makeNGON(size_t n){
 
     QString str;
     for (size_t i = 0 ; i < n; ++i){
-        str.append("v " + QString::number(cos(2 * i * M_PI / ((float) n))) + " " + QString::number(sin(2 * i * M_PI / ((float) n))) + " ");
+        str.append("v " + QString::number(0.8 * cos(2 * i * M_PI / ((float) n))) + " " + QString::number(0.8 * sin(2 * i * M_PI / ((float) n))) + " ");
         str.append("0.0 0.0 0.0\n");
     }
 

@@ -23,7 +23,7 @@ public:
 
     Mesh *tMeshes[2];
     Mesh *refMeshes[2];
-    size_t ccSteps = 2;
+    size_t ccSteps = 3;
     void setRefineMeshColours();
     size_t cc_steps = 2;
     void updateEm();
