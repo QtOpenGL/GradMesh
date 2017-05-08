@@ -192,16 +192,6 @@
         <string>Skeleton</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="methodLE">
-       <property name="geometry">
-        <rect>
-         <x>15</x>
-         <y>455</y>
-         <width>113</width>
-         <height>27</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QPushButton" name="ImportTRI">
        <property name="geometry">
         <rect>
@@ -215,45 +205,6 @@
         <string>Triangle</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="makeNGonPB">
-       <property name="geometry">
-        <rect>
-         <x>15</x>
-         <y>565</y>
-         <width>85</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Make n gon</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="toStringPB">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>715</y>
-         <width>85</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>To string</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="toNewMeshPB">
-       <property name="geometry">
-        <rect>
-         <x>15</x>
-         <y>620</y>
-         <width>85</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>To new mesh</string>
-       </property>
-      </widget>
       <widget class="QCheckBox" name="refineCB">
        <property name="geometry">
         <rect>
@@ -265,6 +216,38 @@
        </property>
        <property name="text">
         <string>Refined Mesh</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>570</y>
+         <width>69</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="CCspinBox">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>450</y>
+         <width>48</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="value">
+        <number>4</number>
        </property>
       </widget>
      </widget>

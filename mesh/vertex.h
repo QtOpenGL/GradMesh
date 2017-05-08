@@ -16,7 +16,6 @@ public:
   unsigned int index;
   unsigned short sharpness;
   QVector3D colour;
-  int originalFaceIndex = -1;
 
   // Inline constructors
   Vertex() {
@@ -30,7 +29,7 @@ public:
   }
 
   Vertex(QVector2D &vcoords, HalfEdge* vout, unsigned short vval, unsigned int vindex,
-         float vsharpness = 0, QVector3D vcolour = QVector3D(1.0, 1.0, 0.0), int idx = -1) {
+         float vsharpness = 0, QVector3D vcolour = QVector3D(1.0, 1.0, 0.0)) {
     //qDebug() << "QVector3D Vertex Constructor";
     coords = vcoords;
     out = vout;
@@ -38,7 +37,6 @@ public:
     index = vindex;
     sharpness = vsharpness;
     colour = vcolour;
-    originalFaceIndex = idx;
   }
 };
 

@@ -88,6 +88,7 @@ QVector3D limitPoint(Vertex *vtx){
 }
 
 void Renderables::setRefineMeshColours(){
+    QVector3D C;
     int counter = -1;
     HalfEdge *currentEdge;
     Face *currentFace;
@@ -95,20 +96,35 @@ void Renderables::setRefineMeshColours(){
     for (int i = 0; i < controlMesh->mesh->Faces.size(); ++i){
         currentFace = &controlMesh->mesh->Faces[i];
         counter += 2 * currentFace->val + 1;
+        if (not controlMesh->mesh->Faces[i].colControl)
+            continue;
+        int n = currentFace->val;
+        C = *(controlMesh->mesh->Faces[i].colControl);
         currentVertex = &refineMesh->mesh->Vertices[counter];
-//        QVector3D r0 = limitPoint(&colourSurface->mesh->Vertices[counter]);
-//        float r0 = colourSurface->mesh->Vertices[counter].colour[1];
-//        r0 = 0.9;
-//        qDebug() << r0;
+        QVector3D r0 = limitPoint(&colourSurface->mesh->Vertices[counter]);
+        QVector3D cVec = C - r0;
+        QVector3D baseCol;
+
+        float beta = (n * (n + 5.0f - n * alpha)) / (5.0f * n);
+        qDebug() << (n*n*alpha + 5 * n * beta) / (n * (n + 5));
+
+        baseCol[0] = cVec[0];
+        baseCol[1] = cVec[1];
+        baseCol[2] = cVec[2];
+
+        baseCol[0] /= 2 >= 0 ? (1 - r0[0]) : r0[0];
+        baseCol[1] /= 2 >= 0 ? (1 - r0[1]) : r0[1];
+        baseCol[2] /= 2 >= 0 ? (1 - r0[2]) : r0[2];
+
         currentEdge = currentVertex->out;
         for (int k = 0; k < currentVertex->val; ++k){
             for (int j = 0; j < currentEdge->polygon->val; ++j){
-                currentEdge->target->colour = QVector3D(1.0, 1.0, 1.0);
+                currentEdge->target->colour = beta * baseCol;
                 currentEdge = currentEdge->next;
             }
             currentEdge = currentEdge->prev->twin;
         }
-        currentVertex->colour = QVector3D(1.0, 1.0, 1.0);
+        currentVertex->colour = alpha * baseCol;
     }
 }
 
@@ -120,12 +136,18 @@ void Renderables::updateEm(){
 
     size_t tIndex = 1;
 
-    ternaryStep(tMeshes[1 - tIndex], tMeshes[tIndex]);
+    ternaryStep(tMeshes[1 - tIndex], tMeshes[tIndex]);   
+    tIndex = 1 - tIndex;
+    tMeshes[tIndex] = new Mesh;
+    subdivideCatmullClark(tMeshes[1 - tIndex], tMeshes[tIndex]);
     tIndex = 1 - tIndex;
     tMeshes[tIndex] = new Mesh;
 
-    for (size_t refIndex = 0; refIndex < ccSteps; ++refIndex){
+    int counter = -1;
+
+    for (size_t refIndex = 1; refIndex < ccSteps; ++refIndex){
         subdivideCatmullClark(tMeshes[1 - tIndex], tMeshes[tIndex]);
+        counter += tMeshes[1 - tIndex]->Faces.size();
         tIndex = 1 - tIndex;
         tMeshes[tIndex] = new Mesh;
     }
@@ -139,7 +161,6 @@ void Renderables::updateEm(){
     subdivideCatmullClark(temp, refineMesh->mesh);
     for (Vertex& vtx : refineMesh->mesh->Vertices)
         vtx.colour = QVector3D(0.0, 0.0, 0.0);
-
 
     setRefineMeshColours();
     refMeshes[0] = refineMesh->mesh;
@@ -157,17 +178,25 @@ void Renderables::updateEm(){
 
     assert(colourSurface->mesh->Vertices.size() == refineMesh->mesh->Vertices.size());
 
-    for (int i = 0; i < colourSurface->mesh->Vertices.size(); ++i){
-        colourSurface->mesh->Vertices[i].colour += (QVector3D(1.0, 1.0, 1.0) -  colourSurface->mesh->Vertices[i].colour) * refineMesh->mesh->Vertices[i].colour;
-        if (colourSurface->mesh->Vertices[i].colour[0] > 1.0f ||
-                colourSurface->mesh->Vertices[i].colour[1] > 1.0f ||
-                colourSurface->mesh->Vertices[i].colour[2] > 1.0f )
-            qDebug() << colourSurface->mesh->Vertices[i].colour[0];
+
+    Face *currentFace;
+    for (int i = 0; i < controlMesh->mesh->Faces.size(); ++i){
+        currentFace = &controlMesh->mesh->Faces[i];
+        counter += 2 * currentFace->val + 1;
+        if (not currentFace->colControl)
+            continue;
+        colourSurface->mesh->Vertices[counter].colour = limitPoint(&colourSurface->mesh->Vertices[counter]);
+
     }
 
+//    for (int i = 0; i < colourSurface->mesh->Vertices.size(); ++i){
+//        colourSurface->mesh->Vertices[i].colour += (QVector3D(1.0, 1.0, 1.0) -  colourSurface->mesh->Vertices[i].colour) * refineMesh->mesh->Vertices[i].colour;
+//        if (colourSurface->mesh->Vertices[i].colour[0] > 1.0f ||
+//                colourSurface->mesh->Vertices[i].colour[1] > 1.0f ||
+//                colourSurface->mesh->Vertices[i].colour[2] > 1.0f )
+//            qDebug() << colourSurface->mesh->Vertices[i].colour;
+//    }
 
     colourSurface->fillCoords();
     colourSurface->fillColours();
-
-    return;
 }

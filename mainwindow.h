@@ -32,6 +32,10 @@ private slots:
 
     void on_refineCB_toggled(bool checked);
 
+    void on_doubleSpinBox_valueChanged(double arg1);
+
+    void on_CCspinBox_valueChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
 

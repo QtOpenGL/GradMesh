@@ -4,6 +4,7 @@
 #include "enums.h"
 #include "subdiv/subdiv.h"
 #include "subdiv/subdiv.h"
+#include <QColorDialog>
 #include <assert.h>
 
 MainWindow::MainWindow(QWidget *parent) :  QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -85,14 +86,13 @@ void MainWindow::on_refineFacePB_clicked()
         qDebug() << "No face selected";
         return;
     }
-    OBJFile obj =  ccSingleFace(
-                ui->mainView->rndrbles->controlMesh->mesh,
-                ui->mainView->mouseHandler->selectedFace
-                );
+    QColor c = QColorDialog::getColor(Qt::white, static_cast<QWidget*>(ui->mainView));
+    if (c.isValid()){
+        ui->mainView->rndrbles->controlMesh->mesh->Faces[selectedFace].colControl = new QVector3D;
+        *(ui->mainView->rndrbles->controlMesh->mesh->Faces[selectedFace].colControl) = QVector3D(c.redF(), c.greenF(), c.blueF());
+        ui->mainView->rndrbles->updateEm();
+    }
 
-//    qDebug() << obj.vertexCoords;
-    ui->mainView->rndrbles->controlMesh->mesh = new Mesh;
-    ui->mainView->rndrbles->init(&obj);
 }
 
 void MainWindow::on_ImportTRI_clicked()
@@ -172,4 +172,18 @@ void MainWindow::on_toNewMeshPB_clicked()
 void MainWindow::on_refineCB_toggled(bool checked)
 {
     ui->mainView->showRefine = checked;
+}
+
+
+
+void MainWindow::on_doubleSpinBox_valueChanged(double arg1)
+{
+    ui->mainView->rndrbles->alpha = arg1;
+    ui->mainView->rndrbles->updateEm();
+}
+
+void MainWindow::on_CCspinBox_valueChanged(int arg1)
+{
+    ui->mainView->rndrbles->ccSteps = arg1;
+    ui->mainView->rndrbles->updateEm();
 }

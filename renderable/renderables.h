@@ -25,11 +25,12 @@ public:
     Mesh *refMeshes[2];
     size_t ccSteps = 3;
     void setRefineMeshColours();
-    size_t cc_steps = 2;
+    size_t cc_steps = 4;
     void updateEm();
     void init(OBJFile* loadedOBJFile);
     void init(Mesh *mesh);
     void init();
+    float alpha = 1.0;
 };
 
 #endif // RENDERABLES_H

@@ -76,8 +76,7 @@ void ternaryStep(Mesh *inputMesh, Mesh *outputMesh){
                                             4,
                                             vertIndex,
                                             0,
-                                            currentEdge->target->colour,
-                                            k
+                                            currentEdge->target->colour
                                             ));
             currentEdge = currentEdge->next;
             ++vertIndex;
