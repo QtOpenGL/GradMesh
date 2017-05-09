@@ -96,10 +96,6 @@ void MainView::initializeGL() {
 
 void MainView::renderRenderable(Renderable *obj, QOpenGLShaderProgram *shaderProg, GLenum mode){
     glBindVertexArray(obj->vao);
-    if (mode == GL_POINTS){
-        qDebug() << "Use renderRenderablePoints to render points";
-        return;
-    }
     bindShader(shaderProg);
     glDrawElements(mode, obj->indices->size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -123,7 +119,6 @@ void MainView::renderRenderablePoints(Renderable *obj, size_t startIndex, size_t
     glDrawArrays(GL_POINTS, startIndex, count);
     glBindVertexArray(0);
 }
-
 
 void MainView::paintGL() {
     glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -150,8 +145,23 @@ void MainView::paintGL() {
     }
 
     if (rndr->controlMesh->hasMesh() && showControlNet){
-        (static_cast<Renderable *>(rndr->controlMesh))->updateRenderable(this);
-        renderRenderable(static_cast<Renderable *>(rndr->controlMesh), greyShaderProg, GL_LINE_LOOP);
+        if (ref_level == 0){
+            (static_cast<Renderable *>(rndr->controlMesh))->updateRenderable(this);
+            renderRenderable(static_cast<Renderable *>(rndr->controlMesh), greyShaderProg, GL_LINE_LOOP);
+        }
+        if (ref_level > 0){
+            rndr->meshVector[ref_level]->fillCoords();
+            rndr->meshVector[ref_level]->fillColours();
+            rndr->meshVector[ref_level]->indices->clear();
+            rndr->meshVector[ref_level]->indices->squeeze();
+            for (size_t i = 0; i < rndr->ptIndices[0]->size(); ++i)
+                rndr->meshVector[ref_level]->indices->append((*rndr->ptIndices[0])[i]);
+
+
+            (static_cast<Renderable *>(rndr->meshVector[ref_level]))->updateRenderable(this);
+            renderRenderable(static_cast<Renderable *>(rndr->meshVector[ref_level]), greyShaderProg, GL_POINTS);
+//            renderRenderablePoints(static_cast<Renderable *>(rndr->meshVector[ref_level]), 0, (rndr->meshVector[ref_level])->indices->size());
+        }
     }
 
     if (rndr->skeletonMesh->hasMesh() && showGradients){

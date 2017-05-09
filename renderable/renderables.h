@@ -21,9 +21,9 @@ public:
     QVector<Renderable *> *renderableList;
 
     QVector<MeshRenderable *> meshVector;
+    QVector<QVector<unsigned int>* > ptIndices;
 
     size_t ccSteps = 3;
-    size_t cc_steps = 4;
     void updateEm();
     void init(OBJFile* loadedOBJFile);
     void init(Mesh *mesh);

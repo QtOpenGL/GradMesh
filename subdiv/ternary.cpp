@@ -42,7 +42,6 @@ void ternaryStep(Mesh *inputMesh, Mesh *outputMesh){
     float d1, d2, N1, N2, V01, V02;
     QVector2D V0, V1, V2, D1, D2, C;      // V1 ---- V0 ---- V2
 
-//    Vertex(QVector2D &vcoords, HalfEdge* vout, unsigned short vval, unsigned int vindex, float vsharpness = 0, QVector3D vcolour = QVector3D(1.0, 1.0, 0.0)) {
     size_t vertIndex = vertCount + edgeCount;
     for (k = 0; k < faceCount; ++k){
         currentEdge = inputMesh->Faces[k].side;

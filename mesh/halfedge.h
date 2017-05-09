@@ -51,6 +51,9 @@ public:
       return target->coords;
   }
 
+  float length(){
+      return (start() - end()).length();
+  }
 };
 
 #endif // HALFEDGE

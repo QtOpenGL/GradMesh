@@ -38,6 +38,8 @@ public:
     sharpness = vsharpness;
     colour = vcolour;
   }
+
 };
+
 
 #endif // VERTEX

@@ -12,8 +12,6 @@ public:
     HalfEdge* side;
     unsigned short val;
     unsigned int index;
-    QVector3D *colControl = nullptr;
-    // Inline constructors
 
     Face() {
         side = nullptr;

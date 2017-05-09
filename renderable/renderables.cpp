@@ -89,6 +89,18 @@ void Renderables::updateEm(){
 
     colourSurface->fillCoords();
     colourSurface->fillColours();
+
+    ptIndices.clear();
+    ptIndices.squeeze();
+    ptIndices.append(new QVector<unsigned int>);
+
+    QVector<Face> const *cFaces = &controlMesh->mesh->Faces;
+    int counter = -1;
+    for (size_t i = 0; i < static_cast<size_t>(cFaces->size()); ++i){
+        counter += 2 * controlMesh->mesh->Faces[i].val + 1;
+        ptIndices[0]->append(counter);
+    }
+
 }
 
 
