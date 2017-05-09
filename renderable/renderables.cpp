@@ -68,6 +68,17 @@ QVector3D limitPoint(Vertex *vtx){
     return (result / (n * (n + 5)));
 }
 
+bool isEdgeVertex(Vertex *vtx){
+    size_t n = vtx->val;
+    HalfEdge *currentEdge = vtx->out;
+    for (size_t i = 0; i < n; ++i){
+        if (not currentEdge->polygon)
+            return true;
+        currentEdge = currentEdge->twin->next;
+    }
+    return false;
+}
+
 void Renderables::threeRing(Vertex *vertex, QVector<unsigned int> *pts, int counter){
     int n = vertex->val;
     HalfEdge *currentEdge;
@@ -81,20 +92,24 @@ void Renderables::threeRing(Vertex *vertex, QVector<unsigned int> *pts, int coun
 
         pts->append(currentEdge->twin->target->index);
 
-        for (int j = 0; j < 2; ++j)
+        for (int dummy = 0; dummy < 2; ++dummy)
             currentEdge = currentEdge->next->twin->next;
         currentEdge = currentEdge->next;
 
         pts->append(currentEdge->twin->target->index);
 
-        for (int j = 0; j < 2; ++j)
+        for (int dummy = 0; dummy < 2; ++dummy)
             currentEdge = currentEdge->next->twin->next;
-        currentEdge = currentEdge->next->twin->next;
+        currentEdge = currentEdge->next;
+
+            currentEdge = currentEdge->twin->next;
+
+
         pts->append(currentEdge->twin->target->index);
+        pts->append(counter);
 
+        pts->append(controlMesh->maxInt);
     }
-    pts->append(controlMesh->maxInt);
-
 }
 
 void Renderables::updateEm(){
@@ -114,6 +129,11 @@ void Renderables::updateEm(){
     for (size_t refIndex = 0; refIndex < ccSteps; ++refIndex)
         subdivideCatmullClark(meshVector[refIndex]->mesh, meshVector[refIndex + 1]->mesh);
 
+    for (size_t i = 0; i < ccSteps + 1; ++i){
+        meshVector[i]->fillCoords();
+        meshVector[i]->fillColours();
+    }
+
     colourSurface->mesh = meshVector[ccSteps]->mesh;
 
     colourSurface->fillCoords();
@@ -129,32 +149,34 @@ void Renderables::updateEm(){
         counter += 2 * controlMesh->mesh->Faces[i].val + 1;
         threeRing(&meshVector[1]->mesh->Vertices[counter], ptIndices[0], counter);
     }
+
+    HalfEdge *currentEdge;
+    for (int i = 1; i < ccSteps; i++){
+        counter = meshVector[i]->mesh->Faces.size();
+        ptIndices.append(new QVector<unsigned int>);
+        qDebug() << i;
+        for (int p = 0; p < ptIndices[i - 1]->size(); ++p){
+            int index = (*ptIndices[i - 1])[p];
+            if (index == controlMesh->maxInt)
+                continue;
+//            ptIndices[i]->append(counter + index);
+            if (isEdgeVertex(&meshVector[i + 1]->mesh->Vertices[counter + index])){
+                currentEdge = meshVector[i + 1]->mesh->Vertices[counter + index].out;
+                while (currentEdge->twin->polygon)
+                    currentEdge = currentEdge->twin->next;
+
+                for (int dummy = 0; dummy < 2; ++dummy)
+                    currentEdge = currentEdge->next->twin->next;
+                currentEdge = currentEdge->next;
+
+                for (int dummy = 0; dummy < 2; ++dummy)
+                    currentEdge = currentEdge->next->twin->next;
+
+                int eInd = currentEdge->target->index;
+                threeRing(&meshVector[i + 1]->mesh->Vertices[eInd], ptIndices[i], eInd);
+                continue;
+            }
+            threeRing(&meshVector[i + 1]->mesh->Vertices[counter + index], ptIndices[i], counter + index);
+        }
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

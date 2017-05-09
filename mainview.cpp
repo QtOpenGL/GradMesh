@@ -150,18 +150,15 @@ void MainView::paintGL() {
             renderRenderable(static_cast<Renderable *>(rndr->controlMesh), greyShaderProg, GL_LINE_LOOP);
         }
         if (ref_level > 0){
-            rndr->meshVector[ref_level]->fillCoords();
-            rndr->meshVector[ref_level]->fillColours();
             rndr->meshVector[ref_level]->indices->clear();
             rndr->meshVector[ref_level]->indices->squeeze();
-            for (size_t i = 0; i < rndr->ptIndices[0]->size(); ++i)
-                rndr->meshVector[ref_level]->indices->append((*rndr->ptIndices[0])[i]);
+            for (size_t i = 0; i < rndr->ptIndices[ref_level - 1]->size(); ++i)
+                rndr->meshVector[ref_level]->indices->append((*rndr->ptIndices[ref_level - 1])[i]);
 
             (static_cast<Renderable *>(rndr->meshVector[ref_level]))->updateRenderable(this);
             renderRenderable(static_cast<Renderable *>(rndr->meshVector[ref_level]), greyShaderProg, GL_LINE_LOOP);
-            for (int i = 0; i < rndr->ptIndices[0]->size(); ++i){
-                renderRenderablePoints(static_cast<Renderable *>(rndr->meshVector[ref_level]), (*rndr->ptIndices[0])[i], 1);
-            }
+            for (int i = 0; i < rndr->ptIndices[ref_level - 1]->size(); ++i)
+                renderRenderablePoints(static_cast<Renderable *>(rndr->meshVector[ref_level]), (*rndr->ptIndices[ref_level - 1])[i], 1);
         }
     }
 

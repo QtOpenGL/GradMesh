@@ -28,24 +28,23 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
   for (k=0; k<numFaces; k++)
     sumFaceValences += inputMesh->Faces[k].val;
 
-
   subdivMesh->HalfEdges.reserve(2*numHalfEdges + 2*sumFaceValences);
   subdivMesh->Faces.reserve(sumFaceValences);
 
   // Create face points
   VertInfo newVert;
   for (k=0; k<numFaces; k++) {
-    n = inputMesh->Faces[k].val;
-    newVert = facePoint(inputMesh->Faces[k].side);
-    // Coords (x,y), Out, Valence, Index
-    subdivMesh->Vertices.append( Vertex(newVert.pos,
-                                        nullptr,
-                                        n,
-                                        k,
-                                        0,
-                                        newVert.col
-                                        ) );
-  }
+      n = inputMesh->Faces[k].val;
+      newVert = facePoint(inputMesh->Faces[k].side);
+      // Coords (x,y), Out, Valence, Index
+      subdivMesh->Vertices.append( Vertex(newVert.pos,
+                                          nullptr,
+                                          n,
+                                          k,
+                                          0,
+                                          newVert.col
+                                          ) );
+    }
 
 //  qDebug() << " * Created face points";
 
