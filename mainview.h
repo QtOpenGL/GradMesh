@@ -34,6 +34,7 @@ public:
     Renderables *rndrbles;
     MouseHandler *mouseHandler;
     void createBuffer();
+    size_t ref_level = 0;
 
 protected:
     void initializeGL();
@@ -43,13 +44,12 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
 
 private:
-
     void bindShader(QOpenGLShaderProgram *program);
 
     void registerRenderable(Renderable *obj);
     void updateRenderable(Renderable *obj);
     void renderRenderable(Renderable *obj, QOpenGLShaderProgram*shaderProg, GLenum mode);
-    void renderRenderablePoints(Renderable *obj, size_t startIndex, size_t endIndex);
+    void renderRenderablePoints(Renderable *obj, size_t startIndex, size_t count);
 
     QOpenGLDebugLogger* debugLogger;
 

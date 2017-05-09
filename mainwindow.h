@@ -23,18 +23,12 @@ private slots:
     void on_controlNetCB_toggled(bool checked);
     void on_colourSurfaceCB_toggled(bool checked);
     void on_gradSlider_valueChanged(int value);
-    void on_refineFacePB_clicked();
     void on_skeletonCB_toggled(bool checked);
     void on_ImportTRI_clicked();
     void on_makeNGonPB_clicked();
-    void on_toStringPB_clicked();
-    void on_toNewMeshPB_clicked();
-
-    void on_refineCB_toggled(bool checked);
-
-    void on_doubleSpinBox_valueChanged(double arg1);
-
     void on_CCspinBox_valueChanged(int arg1);
+
+    void on_levelSpinBox_valueChanged(int arg1);
 
 private:
     Ui::MainWindow *ui;

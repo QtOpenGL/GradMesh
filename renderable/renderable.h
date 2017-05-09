@@ -23,6 +23,7 @@ public:
     void registerRenderable(MainView *ui);
     void updateRenderable(MainView *ui);
     void fillNonsense();
+    bool isRegistered = false;
 };
 
 

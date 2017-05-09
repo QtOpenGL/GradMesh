@@ -13,7 +13,6 @@ public:
     virtual ~Renderables();
     MeshRenderable *controlMesh;
     MeshRenderable *colourSurface;
-    MeshRenderable *refineMesh;
     ControlRenderable *skeletonMesh;
 
     Renderable *edgeRenderable;
@@ -21,10 +20,9 @@ public:
 
     QVector<Renderable *> *renderableList;
 
-    Mesh *tMeshes[2];
-    Mesh *refMeshes[2];
+    QVector<MeshRenderable *> meshVector;
+
     size_t ccSteps = 3;
-    void setRefineMeshColours();
     size_t cc_steps = 4;
     void updateEm();
     void init(OBJFile* loadedOBJFile);

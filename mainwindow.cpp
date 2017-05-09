@@ -34,8 +34,6 @@ void MainWindow::on_gradientCB_toggled(bool checked)
 void MainWindow::on_controlNetCB_toggled(bool checked)
 {
     ui->mainView->showControlNet = checked;
-    if (checked)
-        ui->mainView->showSkeleton = false;
 }
 
 void MainWindow::on_colourSurfaceCB_toggled(bool checked)
@@ -46,8 +44,6 @@ void MainWindow::on_colourSurfaceCB_toggled(bool checked)
 void MainWindow::on_skeletonCB_toggled(bool checked)
 {
     ui->mainView->showSkeleton = checked;
-    if (checked)
-        ui->mainView->showControlNet = false;
 }
 
 
@@ -79,22 +75,6 @@ void MainWindow::on_gradSlider_valueChanged(int value)
     ui->mainView->rndrbles->updateEm();
 }
 
-void MainWindow::on_refineFacePB_clicked()
-{
-    int selectedFace = ui->mainView->mouseHandler->selectedFace;
-    if (selectedFace == -1){
-        qDebug() << "No face selected";
-        return;
-    }
-    QColor c = QColorDialog::getColor(Qt::white, static_cast<QWidget*>(ui->mainView));
-    if (c.isValid()){
-        ui->mainView->rndrbles->controlMesh->mesh->Faces[selectedFace].colControl = new QVector3D;
-        *(ui->mainView->rndrbles->controlMesh->mesh->Faces[selectedFace].colControl) = QVector3D(c.redF(), c.greenF(), c.blueF());
-        ui->mainView->rndrbles->updateEm();
-    }
-
-}
-
 void MainWindow::on_ImportTRI_clicked()
 {
     OBJFile newModel = OBJFile("../../CAD2/CAD/models/tri1.obj");
@@ -114,76 +94,13 @@ void MainWindow::on_makeNGonPB_clicked()
     ui->mainView->updateBuffers();
 }
 
-void MainWindow::on_toStringPB_clicked()
-{
-    Mesh *mesh = ui->mainView->rndrbles->colourSurface->mesh;
-    QString str;
-    Vertex *vtx;
-    Face *face;
-    for (int i = 0; i < mesh->Vertices.size(); ++i){
-        vtx = &mesh->Vertices[i];
-        str.append(vtxToString(vtx));
-        str.append("\n");
-    }
-    str.append("s off\n");
-    for (int i = 0; i < mesh->Faces.size(); ++i){
-        face = &mesh->Faces[i];
-        str.append(faceToString(face));
-        str.append("\n");
-    }
-
-    qDebug().noquote() << str;
-}
-
-void MainWindow::on_toNewMeshPB_clicked()
-{
-    Mesh *mesh = ui->mainView->rndrbles->colourSurface->mesh;
-    QString str;
-    Vertex *vtx;
-    Face *face;
-    for (int i = 0; i < mesh->Vertices.size(); ++i){
-        vtx = &mesh->Vertices[i];
-        str.append(vtxToString(vtx));
-        str.append("\n");
-    }
-    str.append("s off\n");
-    for (int i = 0; i < mesh->Faces.size(); ++i){
-        face = &mesh->Faces[i];
-        str.append(faceToString(face));
-        str.append("\n");
-    }
-
-    delete mesh;
-    mesh = new Mesh;
-    QFile caFile("output.txt");
-    caFile.open(QIODevice::WriteOnly | QIODevice::Text);
-
-    assert(caFile.isOpen());
-    QTextStream outStream(&caFile);
-    outStream << str;
-    caFile.close();
-
-    OBJFile obj("output.txt");
-
-
-    ui->mainView->rndrbles->init(&obj);
-}
-
-void MainWindow::on_refineCB_toggled(bool checked)
-{
-    ui->mainView->showRefine = checked;
-}
-
-
-
-void MainWindow::on_doubleSpinBox_valueChanged(double arg1)
-{
-    ui->mainView->rndrbles->alpha = arg1;
-    ui->mainView->rndrbles->updateEm();
-}
-
 void MainWindow::on_CCspinBox_valueChanged(int arg1)
 {
     ui->mainView->rndrbles->ccSteps = arg1;
     ui->mainView->rndrbles->updateEm();
+}
+
+void MainWindow::on_levelSpinBox_valueChanged(int arg1)
+{
+    ui->mainView->ref_level = arg1;
 }

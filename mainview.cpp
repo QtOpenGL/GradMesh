@@ -111,16 +111,16 @@ void MainView::bindShader(QOpenGLShaderProgram *program){
     program->bind();
 }
 
-void MainView::renderRenderablePoints(Renderable *obj, size_t startIndex, size_t endIndex){
+void MainView::renderRenderablePoints(Renderable *obj, size_t startIndex, size_t count){
     glBindVertexArray(obj->vao);
 
     bindShader(blackShaderProg);
     glPointSize(8.0);
-    glDrawArrays(GL_POINTS, startIndex, endIndex);
+    glDrawArrays(GL_POINTS, startIndex, count);
 
     bindShader(mainShaderProg);
     glPointSize(6.0);
-    glDrawArrays(GL_POINTS, startIndex, endIndex);
+    glDrawArrays(GL_POINTS, startIndex, count);
     glBindVertexArray(0);
 }
 
@@ -134,33 +134,24 @@ void MainView::paintGL() {
     if (not rndr)
         return;
 
+    for (size_t i = 0; i < static_cast<size_t>(rndr->meshVector.size()); ++i)
+        if (not rndr->meshVector[i]->isRegistered)
+            rndr->meshVector[i]->registerRenderable(this);
+
     if (rndr->colourSurface->hasMesh() && showColourSurface){
         (static_cast<Renderable *>(rndr->colourSurface))->updateRenderable(this);
         renderRenderable(static_cast<Renderable *>(rndr->colourSurface), mainShaderProg, GL_TRIANGLE_FAN);
-
     }
 
     if (rndr->colourSurface->hasMesh() && showSkeleton){
         (static_cast<Renderable *>(rndr->colourSurface))->updateRenderable(this);
-        renderRenderable(static_cast<Renderable *>(rndr->colourSurface), blackShaderProg, GL_LINE_LOOP);
+//        renderRenderable(static_cast<Renderable *>(rndr->colourSurface), blackShaderProg, GL_LINE_LOOP);
         renderRenderablePoints(static_cast<Renderable *>(rndr->colourSurface), 0, rndr->colourSurface->indices->size());
     }
 
     if (rndr->controlMesh->hasMesh() && showControlNet){
         (static_cast<Renderable *>(rndr->controlMesh))->updateRenderable(this);
-        renderRenderable(static_cast<Renderable *>(rndr->controlMesh), blackShaderProg, GL_LINE_LOOP);
-    }
-
-    if (rndr->refineMesh->hasMesh()  && showRefine){
-        (static_cast<Renderable *>(rndr->refineMesh))->updateRenderable(this);
-        renderRenderable(static_cast<Renderable *>(rndr->refineMesh), mainShaderProg, GL_TRIANGLE_FAN);
-        int counter = -1;
-        if (mouseHandler->selectedFace != -1){
-            for (int i = 0; i <= mouseHandler->selectedFace; ++i){
-                counter += 2 * rndr->controlMesh->mesh->Faces[i].val + 1;
-            }
-            renderRenderablePoints(static_cast<Renderable *>(rndr->refineMesh), counter, 1);
-        }
+        renderRenderable(static_cast<Renderable *>(rndr->controlMesh), greyShaderProg, GL_LINE_LOOP);
     }
 
     if (rndr->skeletonMesh->hasMesh() && showGradients){

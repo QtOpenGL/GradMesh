@@ -2,11 +2,11 @@
 
 MeshRenderable::MeshRenderable()
 {
-
+    mesh = new Mesh;
 }
 
 MeshRenderable::~MeshRenderable(){
-
+    delete mesh;
 }
 
 void MeshRenderable::fillCoords(){

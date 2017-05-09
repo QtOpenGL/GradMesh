@@ -30,6 +30,7 @@ void Renderable::registerRenderable(MainView *ui){
     ui->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesBO);
 
     ui->glBindVertexArray(0);
+    isRegistered = true;
 }
 
 
