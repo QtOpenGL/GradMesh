@@ -29,6 +29,8 @@ public:
     void init(Mesh *mesh);
     void init();
     float alpha = 1.0;
+
+    void threeRing(Vertex *vertex, QVector<unsigned int> *pts, int counter);
 };
 
 #endif // RENDERABLES_H

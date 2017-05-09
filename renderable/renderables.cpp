@@ -68,6 +68,35 @@ QVector3D limitPoint(Vertex *vtx){
     return (result / (n * (n + 5)));
 }
 
+void Renderables::threeRing(Vertex *vertex, QVector<unsigned int> *pts, int counter){
+    int n = vertex->val;
+    HalfEdge *currentEdge;
+    currentEdge = vertex->out;
+    for (int j = 0; j < 2; ++j)
+        currentEdge = currentEdge->next->twin->next;
+    currentEdge = currentEdge->next;
+
+    for (int k = 0; k < n; ++k){
+        pts->append(counter);
+
+        pts->append(currentEdge->twin->target->index);
+
+        for (int j = 0; j < 2; ++j)
+            currentEdge = currentEdge->next->twin->next;
+        currentEdge = currentEdge->next;
+
+        pts->append(currentEdge->twin->target->index);
+
+        for (int j = 0; j < 2; ++j)
+            currentEdge = currentEdge->next->twin->next;
+        currentEdge = currentEdge->next->twin->next;
+        pts->append(currentEdge->twin->target->index);
+
+    }
+    pts->append(controlMesh->maxInt);
+
+}
+
 void Renderables::updateEm(){
     skeletonMesh->fillCoords();
 
@@ -98,9 +127,8 @@ void Renderables::updateEm(){
     int counter = -1;
     for (size_t i = 0; i < static_cast<size_t>(cFaces->size()); ++i){
         counter += 2 * controlMesh->mesh->Faces[i].val + 1;
-        ptIndices[0]->append(counter);
+        threeRing(&meshVector[1]->mesh->Vertices[counter], ptIndices[0], counter);
     }
-
 }
 
 

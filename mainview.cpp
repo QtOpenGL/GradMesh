@@ -157,10 +157,11 @@ void MainView::paintGL() {
             for (size_t i = 0; i < rndr->ptIndices[0]->size(); ++i)
                 rndr->meshVector[ref_level]->indices->append((*rndr->ptIndices[0])[i]);
 
-
             (static_cast<Renderable *>(rndr->meshVector[ref_level]))->updateRenderable(this);
-            renderRenderable(static_cast<Renderable *>(rndr->meshVector[ref_level]), greyShaderProg, GL_POINTS);
-//            renderRenderablePoints(static_cast<Renderable *>(rndr->meshVector[ref_level]), 0, (rndr->meshVector[ref_level])->indices->size());
+            renderRenderable(static_cast<Renderable *>(rndr->meshVector[ref_level]), greyShaderProg, GL_LINE_LOOP);
+            for (int i = 0; i < rndr->ptIndices[0]->size(); ++i){
+                renderRenderablePoints(static_cast<Renderable *>(rndr->meshVector[ref_level]), (*rndr->ptIndices[0])[i], 1);
+            }
         }
     }
 
