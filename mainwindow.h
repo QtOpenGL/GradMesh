@@ -27,8 +27,9 @@ private slots:
     void on_ImportTRI_clicked();
     void on_makeNGonPB_clicked();
     void on_CCspinBox_valueChanged(int arg1);
-
     void on_levelSpinBox_valueChanged(int arg1);
+    void on_colorPB_released();
+    void on_alphaSlider_valueChanged(int value);
 
 private:
     Ui::MainWindow *ui;

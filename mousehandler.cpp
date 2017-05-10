@@ -6,7 +6,7 @@
 #include "subdiv/subdiv.h"
 #include "subdiv/meshtools.h"
 #include "utilities.h"
-
+#include <memory>
 
 MouseHandler::MouseHandler(Renderables *_rndrbles, MainView *_mainview)
   : rndrbles(_rndrbles),
@@ -33,10 +33,11 @@ void MouseHandler::mousePressEvent(QMouseEvent *event) {
         selectedPt   = selectType == POINTS ? findClosestPoint(xScene, yScene) : -1;
         selectedEdge = selectType == EDGES  ? findClosestEdge(xScene, yScene)  : -1;
         selectedFace = selectType == FACES  ? findClosestFace(xScene, yScene)  : -1;
+        selectedGrad = selectType == GRADS  ? findClosestGrad(xScene, yScene)  : -1;
         break;
     case Qt::RightButton:
         selectedPt = findClosestPoint(xScene, yScene);
-        QColor c = QColorDialog::getColor(Qt::white, static_cast<QWidget*>(mainview));
+        QColor c = QColorDialog::getColor(Qt::white, static_cast<QWidget*>(mainview), "Choose colour");
         if (c.isValid()){
             if (mainview->ref_level == 0){
                 rndrbles->controlMesh->mesh->Vertices[selectedPt].colour = QVector3D(c.redF(), c.greenF(), c.blueF());
@@ -45,7 +46,19 @@ void MouseHandler::mousePressEvent(QMouseEvent *event) {
                 rndrbles->updateEm();
             }
             else {
-                Renderables::controlVec ctrVec = Renderables::controlVec(selectedPt, QVector3D(c.redF(), c.greenF(), c.blueF()), 1.0);
+                QVector<QVector2D> *ptr = new QVector<QVector2D>;
+                Vertex *currentVertex = &rndrbles->meshVector[mainview->ref_level]->mesh->Vertices[selectedPt];
+                HalfEdge *currentEdge = currentVertex->out;
+                for (int k = 0; k < currentVertex->val; ++k){
+                    if (not currentEdge->twin->polygon)
+                        break;
+                    currentEdge = currentEdge->prev->twin;
+                }
+                for (int i = 0; i < currentVertex->val; ++i){
+                    ptr->append(currentEdge->target->coords - currentVertex->coords);
+                    currentEdge = currentEdge->prev->twin;
+                }
+                Renderables::controlVec ctrVec = Renderables::controlVec(selectedPt, QVector3D(c.redF(), c.greenF(), c.blueF()), 1.0, ptr);
                 (*mainview->rndrbles->controlVectors)[mainview->ref_level - 1].append(ctrVec);
                 rndrbles->updateEm();
             }
@@ -66,19 +79,29 @@ void MouseHandler::mouseMoveEvent(QMouseEvent *event) {
     xScene = (1-xRatio)*-1 + xRatio*1;
     yScene = yRatio*-1 + (1-yRatio)*1;
 
-    if (selectType == POINTS){
-        if (type == CONTROL){
-            // Update position of the control point
+    switch (selectType){
+    case POINTS:
+        if (mainview->ref_level == 0){
             rndrbles->controlMesh->mesh->Vertices[selectedPt].coords = QVector2D(xScene, yScene);
             rndrbles->controlMesh->fillCoords();
             rndrbles->skeletonMesh->fillCoords();
-        } else if (type == GRADIENT){
-            HalfEdge *currentEdge = &(rndrbles)->controlMesh->mesh->HalfEdges[selectedPt];
+        }
+        break;
+    case GRADS:
+        if (selectedGrad == -1)
+            return;
+
+        if (mainview->ref_level == 0){
+            HalfEdge *currentEdge = &(rndrbles)->controlMesh->mesh->HalfEdges[selectedGrad];
             currentEdge->colGrad = QVector2D(xScene, yScene) - rndrbles->controlMesh->mesh->Vertices[currentEdge->twin->target->index].coords;
             rndrbles->skeletonMesh->fillCoords();
         }
-        rndrbles->updateEm();
+        else {
+            (*grad)[selectedGrad] = QVector2D(xScene, yScene) - refVert->coords;
+        }
+        break;
     }
+    rndrbles->updateEm();
 }
 
 short int MouseHandler::findClosestPoint(float _x, float _y) {
@@ -86,14 +109,12 @@ short int MouseHandler::findClosestPoint(float _x, float _y) {
     unsigned int ptIndex = -1;
     float currentDist, minDist = 1;
 
-    type = NONE;
     if (mainview->ref_level == 0){
-        for (size_t k = 0; k < (size_t)(rndrbles->skeletonMesh->coords->size()); k++) {
-            currentDist = pow((rndrbles->skeletonMesh->coords->at(k)[0] - _x),2) + pow(( rndrbles->skeletonMesh->coords->at(k)[1] - _y),2);
-            qDebug() << currentDist;
+        for (Vertex &vtx : rndrbles->controlMesh->mesh->Vertices) {
+            currentDist = pow((vtx.coords[0] - _x),2) + pow(( vtx.coords[1] - _y),2);
             if (currentDist < minDist) {
                 minDist = currentDist;
-                ptIndex = k;
+                ptIndex = vtx.index;
             }
         }
     }
@@ -101,40 +122,57 @@ short int MouseHandler::findClosestPoint(float _x, float _y) {
         QVector<unsigned int> *indices = mainview->rndrbles->ptIndices[mainview->ref_level - 1];
         Mesh *mesh = mainview->rndrbles->meshVector[mainview->ref_level]->mesh;
         QVector2D point = QVector2D(_x,_y);
-        for (size_t k = 0; k < (size_t)(indices->size()); k++) {
-            if (indices->at(k) == mainview->rndrbles->controlMesh->maxInt)
+        for (unsigned int k : *indices) {
+            if (k == mainview->rndrbles->controlMesh->maxInt)
                 continue;
-            currentDist = (mesh->Vertices.at(indices->at(k)).coords - point).lengthSquared();
+            currentDist = (mesh->Vertices.at(k).coords - point).lengthSquared();
             if (currentDist < minDist) {
                 minDist = currentDist;
-                ptIndex = indices->at(k);
+                ptIndex = k;
             }
         }
-        return ptIndex;
     }
+    return ptIndex;
+}
 
 
-    if (ptIndex == -1){
-        type = NONE;
-        return -1;
+short int MouseHandler::findClosestGrad(float _x, float _y) {
+    int ptIndex = -1;
+    float currentDist, minDist = 1;
+    if (mainview->ref_level == 0){
+        for (HalfEdge &edge : rndrbles->controlMesh->mesh->HalfEdges){
+            QVector2D pt = edge.prev->target->coords + edge.colGrad;
+            currentDist = pow((pt[0] - _x),2) + pow(( pt[1] - _y),2);
+            if (currentDist < minDist) {
+                minDist = currentDist;
+                ptIndex = edge.index;
+            }
+        }
     }
+    else {
+        grad = nullptr;
+        unsigned int ref_level = mainview->ref_level;
+        QVector<Vertex> *vertices = &rndrbles->meshVector[ref_level]->mesh->Vertices;
+        QVector2D vertexPoint;
+        for (Renderables::controlVec const &ctr : rndrbles->controlVectors->at(mainview->ref_level - 1)){
+            vertexPoint = vertices->at(std::get<0>(ctr)).coords;
+            short int index = 0;
+            for (QVector2D &vec : *std::get<3>(ctr)){
 
-    size_t vertIndex = 0;
-    while (ptIndex >= rndrbles->skeletonMesh->mesh->Vertices[vertIndex].val + 1){
-        ptIndex -= 1 + rndrbles->skeletonMesh->mesh->Vertices[vertIndex].val;
-        vertIndex++;
+                QVector2D pt = vertexPoint + vec;
+                currentDist = pow((pt[0] - _x),2) + pow(( pt[1] - _y),2);
+                if (currentDist < minDist) {
+                    minDist = currentDist;
+                    ptIndex = index;
+                    grad = std::get<3>(ctr);
+                    refVert = &((*vertices)[std::get<0>(ctr)]);
+                }
+                ++index;
+            }
+        }
+        qDebug() << ptIndex;
     }
-    type = ptIndex == 0 ? CONTROL : GRADIENT;
-
-    if (ptIndex == 0)
-        return rndrbles->skeletonMesh->mesh->Vertices[vertIndex].index;
-
-    HalfEdge *currentEdge = rndrbles->skeletonMesh->mesh->Vertices[vertIndex].out;
-    while (ptIndex != 1){
-        currentEdge = currentEdge->prev->twin;
-        --ptIndex;
-    }
-    return currentEdge->index;
+    return ptIndex;
 }
 
 void buildFaceRenderable(short int faceIndex, Renderables *renderables){

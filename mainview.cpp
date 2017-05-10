@@ -107,14 +107,18 @@ void MainView::bindShader(QOpenGLShaderProgram *program){
     program->bind();
 }
 
-void MainView::renderRenderablePoints(Renderable *obj, size_t startIndex, size_t count){
+void MainView::renderRenderablePoints(Renderable *obj, size_t startIndex, size_t count, bool coloured){
     glBindVertexArray(obj->vao);
 
     bindShader(blackShaderProg);
     glPointSize(8.0);
     glDrawArrays(GL_POINTS, startIndex, count);
 
-    bindShader(mainShaderProg);
+    if (coloured)
+        bindShader(mainShaderProg);
+    else
+        bindShader(whiteShaderProg);
+
     glPointSize(6.0);
     glDrawArrays(GL_POINTS, startIndex, count);
     glBindVertexArray(0);
@@ -141,7 +145,7 @@ void MainView::paintGL() {
     if (rndr->colourSurface->hasMesh() && showSkeleton){
         (static_cast<Renderable *>(rndr->colourSurface))->updateRenderable(this);
 //        renderRenderable(static_cast<Renderable *>(rndr->colourSurface), blackShaderProg, GL_LINE_LOOP);
-        renderRenderablePoints(static_cast<Renderable *>(rndr->colourSurface), 0, rndr->colourSurface->indices->size());
+        renderRenderablePoints(static_cast<Renderable *>(rndr->colourSurface), 0, rndr->colourSurface->indices->size(), true);
     }
 
     if (rndr->controlMesh->hasMesh() && showControlNet){
@@ -158,13 +162,28 @@ void MainView::paintGL() {
             (static_cast<Renderable *>(rndr->meshVector[ref_level]))->updateRenderable(this);
             renderRenderable(static_cast<Renderable *>(rndr->meshVector[ref_level]), greyShaderProg, GL_LINE_LOOP);
             if (mouseHandler->selectedPt != (unsigned long)(-1))
-                renderRenderablePoints(static_cast<Renderable *>(rndr->meshVector[ref_level]), mouseHandler->selectedPt, 1);
+                renderRenderablePoints(static_cast<Renderable *>(rndr->meshVector[ref_level]), mouseHandler->selectedPt, 1, true);
         }
     }
 
     if (rndr->skeletonMesh->hasMesh() && showGradients){
-        (static_cast<Renderable *>(rndr->skeletonMesh))->updateRenderable(this);
-        renderRenderablePoints(static_cast<Renderable *>(rndr->skeletonMesh), 0, rndr->skeletonMesh->indices->size());
+        if (ref_level == 0){
+            (static_cast<Renderable *>(rndr->skeletonMesh))->updateRenderable(this);
+            renderRenderablePoints(static_cast<Renderable *>(rndr->skeletonMesh), 0, rndr->skeletonMesh->indices->size(), true);
+        }
+        else {
+            rndr->gradRenderable->coords->clear();
+            rndr->gradRenderable->coords->squeeze();
+            rndr->gradRenderable->colours->clear();
+            rndr->gradRenderable->colours->squeeze();
+            QVector<Vertex> *vertices = &rndr->meshVector[ref_level]->mesh->Vertices;
+            for (auto &ctr : (*rndr->controlVectors)[ref_level - 1]){
+                for (auto &vec : *(std::get<3>(ctr)))
+                    rndr->gradRenderable->coords->append(vec + (*vertices)[std::get<0>(ctr)].coords);
+            }
+            rndr->gradRenderable->updateRenderable(this);
+            renderRenderablePoints(rndr->gradRenderable, 0, rndr->gradRenderable->coords->size(), false);
+        }
     }
 
     int edgeIndex = mouseHandler->selectedEdge;

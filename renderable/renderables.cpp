@@ -3,6 +3,7 @@
 #include "../subdiv/meshtools.h"
 #include "mainview.h"
 #include <assert.h>
+#include <tuple>
 
 Renderables::Renderables()
     :
@@ -11,6 +12,7 @@ Renderables::Renderables()
       skeletonMesh(new ControlRenderable),
       edgeRenderable(new Renderable),
       faceRenderable(new Renderable),
+      gradRenderable(new Renderable),
       renderableList(new QVector<Renderable *>),
       controlVectors(new QVector<QVector <controlVec> >)
 {
@@ -20,6 +22,7 @@ Renderables::Renderables()
     renderableList->append(static_cast<Renderable *>(controlMesh));
     renderableList->append(static_cast<Renderable *>(colourSurface));
     renderableList->append(static_cast<Renderable *>(skeletonMesh));
+    renderableList->append(gradRenderable);
     renderableList->append(edgeRenderable);
     renderableList->append(faceRenderable);
 }
@@ -81,13 +84,29 @@ bool isEdgeVertex(Vertex *vtx){
     return false;
 }
 
+HalfEdge *getBoundaryOut(Vertex *vtx){
+    HalfEdge *currentEdge = vtx->out;
+    while (currentEdge->twin->polygon)
+        currentEdge = currentEdge->twin->next;
+    return currentEdge;
+}
+
 void Renderables::threeRing(Vertex *vertex, QVector<unsigned int> *pts, int counter){
     int n = vertex->val;
     HalfEdge *currentEdge;
-    currentEdge = vertex->out;
+
+    bool isEdgeVtx = isEdgeVertex(vertex);
+    if (isEdgeVtx){
+        currentEdge = getBoundaryOut(vertex);
+        --n;
+    }
+    else
+        currentEdge = vertex->out;
+
     for (int j = 0; j < 2; ++j)
         currentEdge = currentEdge->next->twin->next;
     currentEdge = currentEdge->next;
+
 
     for (int k = 0; k < n; ++k){
         pts->append(counter);
@@ -104,7 +123,7 @@ void Renderables::threeRing(Vertex *vertex, QVector<unsigned int> *pts, int coun
             currentEdge = currentEdge->next->twin->next;
         currentEdge = currentEdge->next;
 
-            currentEdge = currentEdge->twin->next;
+        currentEdge = currentEdge->twin->next;
 
 
         pts->append(currentEdge->twin->target->index);
@@ -114,11 +133,87 @@ void Renderables::threeRing(Vertex *vertex, QVector<unsigned int> *pts, int coun
     }
 }
 
+QVector2D getFacePoint(HalfEdge *currentEdge){
+    float d1, d2, N1, N2, V01, V02;
+    QVector2D V0, V1, V2, D1, D2, C;      // V1 ---- V0 ---- V2
+
+    HalfEdge *midEdge = currentEdge->next->twin->prev->twin;
+    for (int i = 0; i < midEdge->polygon->val; ++i){
+        C += midEdge->target->coords;
+        midEdge = midEdge->next;
+    }
+    C /= midEdge->polygon->val;
+
+    V1 = currentEdge->prev->twin->next->twin->next->next->twin->next->target->coords;
+    V0 = currentEdge->twin->target->coords;
+    V2 = currentEdge->next->twin->next->next->twin->next->target->coords;
+    D1 = currentEdge->prev->twin->target->coords;
+    D2 = currentEdge->target->coords;
+    N1 = D1.length();
+    N2 = D2.length();
+    C = V1 + V2;
+    C /= 2;
+    if (N1 == 0.0 || N2 == 0.0)
+        qDebug() << "Zero length colour gradient";
+
+    V01 = QVector2D(V0 - V1).length();
+    V02 = QVector2D(V0 - V2).length();
+
+    d1 = 2 * N1 / V01;
+    d2 = 2 * N2 / V02;
+
+    QVector2D newPosition =
+        (1 - d1) * (1-d2) * V0 +
+        d1 * d2 * C +
+        d1 * (1 - d2) * (V0 + V01 * D1 / (2 * N1)) +
+        d2 * (1 - d1) * (V0 + V02 * D2 / (2 * N2));
+    return newPosition;
+}
+
 void Renderables::setRing(Vertex *vtx, controlVec &ctr){
-    vtx->colour = ctr.colour;
-    HalfEdge *currentEdge = vtx->out;
-    for (size_t i = 0; i < vtx->val; ++i){
-        currentEdge->target->colour = ctr.colour;
+    int index;
+    QVector3D colour;
+    float alpha;
+    QVector<QVector2D> *grads;
+    std::tie(index, colour, alpha, grads) = ctr;
+    int n = vtx->val;
+    float beta = (n * (n + 5.0f - n * alpha)) / (5.0f * n);
+
+    if (beta < 0){
+        beta = 0;  // We set beta = 0 and alpha to alpha_max
+        alpha = (n * (n + 5)) / static_cast<float>(n * n);
+    }
+
+    if (beta < 0)
+        qDebug() << alpha;
+
+    vtx->colour = colour;
+    bool isEdgeVtx = isEdgeVertex(vtx);
+    HalfEdge *currentEdge;
+    if (isEdgeVtx){
+        currentEdge = getBoundaryOut(vtx);
+        --n;
+    }
+    else
+        currentEdge = vtx->out;
+
+    for (size_t i = 0; i < n; ++i){
+        currentEdge->target->colour = colour;
+        currentEdge->next->target->colour = colour;
+        currentEdge->target->coords = (*grads)[i] + vtx->coords;
+        currentEdge = currentEdge->prev->twin;
+    }
+    if (isEdgeVtx){
+        currentEdge->target->colour = colour;
+        currentEdge->target->coords += (alpha - 1) * (currentEdge->target->coords - vtx->coords);
+    }
+    if (isEdgeVtx)
+        currentEdge = getBoundaryOut(vtx);
+    else
+        currentEdge = vtx->out;
+
+    for (size_t i = 0; i < n; ++i){
+        currentEdge->next->target->coords = currentEdge->target->coords + currentEdge->prev->twin->target->coords - vtx->coords;
         currentEdge = currentEdge->prev->twin;
     }
 }
@@ -141,7 +236,7 @@ void Renderables::updateEm(){
     for (size_t refIndex = 0; refIndex < ccSteps; ++refIndex){
         subdivideCatmullClark(meshVector[refIndex]->mesh, meshVector[refIndex + 1]->mesh);
         for (controlVec ctr : controlVectors->at(refIndex))
-            setRing(&meshVector[refIndex + 1]->mesh->Vertices[ctr.index], ctr);
+            setRing(&meshVector[refIndex + 1]->mesh->Vertices[std::get<0>(ctr)], ctr);
 
     }
 
@@ -166,37 +261,13 @@ void Renderables::updateEm(){
         threeRing(&meshVector[1]->mesh->Vertices[counter], ptIndices[0], counter);
     }
 
-    HalfEdge *currentEdge;
-
     for (int i = 1; i < ccSteps; i++){
-
-        for (controlVec ctr : controlVectors->at(i-1))
-            ctr.print();
-
-
         counter = meshVector[i]->mesh->Faces.size();
         ptIndices.append(new QVector<unsigned int>);
         for (int p = 0; p < ptIndices[i - 1]->size(); ++p){
             int index = (*ptIndices[i - 1])[p];
             if (index == controlMesh->maxInt)
                 continue;
-//            ptIndices[i]->append(counter + index);
-            if (isEdgeVertex(&meshVector[i + 1]->mesh->Vertices[counter + index])){
-                currentEdge = meshVector[i + 1]->mesh->Vertices[counter + index].out;
-                while (currentEdge->twin->polygon)
-                    currentEdge = currentEdge->twin->next;
-
-                for (int dummy = 0; dummy < 2; ++dummy)
-                    currentEdge = currentEdge->next->twin->next;
-                currentEdge = currentEdge->next;
-
-                for (int dummy = 0; dummy < 2; ++dummy)
-                    currentEdge = currentEdge->next->twin->next;
-
-                int eInd = currentEdge->target->index;
-                threeRing(&meshVector[i + 1]->mesh->Vertices[eInd], ptIndices[i], eInd);
-                continue;
-            }
             threeRing(&meshVector[i + 1]->mesh->Vertices[counter + index], ptIndices[i], counter + index);
         }
     }

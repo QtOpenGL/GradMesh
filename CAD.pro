@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     utilities.cpp \
     subdiv/catmullclark.cpp \
     subdiv/ccsingleface.cpp \
-    subdiv/makengon.cpp
+    subdiv/makengon.cpp \
+    dialog.cpp
 
 HEADERS  += mainwindow.h \
     mainview.h \
@@ -44,9 +45,11 @@ HEADERS  += mainwindow.h \
     renderable/meshrenderable.h \
     renderable/renderables.h \
     renderable/controlrenderable.h \
-    utilities.h
+    utilities.h \
+    dialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    dialog.ui
 
 RESOURCES += \
     resources.qrc

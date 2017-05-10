@@ -10,7 +10,8 @@ enum SELECTED_POINT_TYPE{
 enum SELECT_TYPE {
     POINTS,
     EDGES,
-    FACES
+    FACES,
+    GRADS
 };
 
 enum REFINERS{

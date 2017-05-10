@@ -135,6 +135,11 @@
        </item>
        <item>
         <property name="text">
+         <string>Gradients</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>Points</string>
         </property>
        </item>
@@ -242,6 +247,38 @@
        </property>
        <property name="text">
         <string>Level</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="colorPB">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>550</y>
+         <width>99</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>PushButton</string>
+       </property>
+      </widget>
+      <widget class="QSlider" name="alphaSlider">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>610</y>
+         <width>160</width>
+         <height>29</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>99</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </widget>

@@ -6,6 +6,7 @@
 #include "subdiv/subdiv.h"
 #include <QColorDialog>
 #include <assert.h>
+#include <dialog.h>
 
 MainWindow::MainWindow(QWidget *parent) :  QMainWindow(parent), ui(new Ui::MainWindow) {
   qDebug() << "✓✓ MainWindow constructor";
@@ -51,6 +52,7 @@ void MainWindow::on_clickCB_currentIndexChanged(const QString &arg1)
 { // Change the type of shading in use
     ui->mainView->mouseHandler->selectType =
             arg1 == "Points"     ? POINTS :
+            arg1 == "Gradients"  ? GRADS  :
             arg1 == "Edges"      ? EDGES  :
                                    FACES  ;
 
@@ -103,4 +105,29 @@ void MainWindow::on_CCspinBox_valueChanged(int arg1)
 void MainWindow::on_levelSpinBox_valueChanged(int arg1)
 {
     ui->mainView->ref_level = arg1;
+}
+
+void MainWindow::on_colorPB_released()
+{
+    Dialog dia;
+    dia.setModal(true);
+    dia.exec();
+}
+
+void MainWindow::on_alphaSlider_valueChanged(int value)
+{
+    unsigned int selectedPt = ui->mainView->mouseHandler->selectedPt;
+    if (selectedPt == (unsigned long)(-1))
+        return;
+
+    int ref_level = ui->mainView->ref_level;
+    if (ref_level == 0)
+        return;
+
+    for (auto &t : (*ui->mainView->rndrbles->controlVectors)[ref_level - 1]){
+        if (std::get<0>(t) == selectedPt)
+            std::get<2>(t) = value / 40.0f;
+    }
+
+    ui->mainView->rndrbles->updateEm();
 }

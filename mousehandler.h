@@ -15,6 +15,7 @@ public:
     int selectedPt = -1;
     int selectedFace = -1;
     int selectedEdge = -1;
+    int selectedGrad = -1;
     int height, width;
 
     Renderables *rndrbles;
@@ -24,6 +25,10 @@ public:
     short int findClosestPoint(float x, float y);
     short int findClosestEdge(float x, float y);
     short int findClosestFace(float x, float y);
+    short int findClosestGrad(float x, float y);
+
+    QVector<QVector2D> *grad = nullptr;
+    Vertex *refVert = nullptr;
 
     MainView *mainview;
     SELECTED_POINT_TYPE type;

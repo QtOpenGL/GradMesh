@@ -49,7 +49,7 @@ private:
     void registerRenderable(Renderable *obj);
     void updateRenderable(Renderable *obj);
     void renderRenderable(Renderable *obj, QOpenGLShaderProgram*shaderProg, GLenum mode);
-    void renderRenderablePoints(Renderable *obj, size_t startIndex, size_t count);
+    void renderRenderablePoints(Renderable *obj, size_t startIndex, size_t count, bool coloured = true);
 
     QOpenGLDebugLogger* debugLogger;
 
