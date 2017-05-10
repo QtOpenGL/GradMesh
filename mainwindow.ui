@@ -214,6 +214,9 @@
          <height>27</height>
         </rect>
        </property>
+       <property name="maximum">
+        <number>3</number>
+       </property>
       </widget>
       <widget class="QLabel" name="label">
        <property name="geometry">

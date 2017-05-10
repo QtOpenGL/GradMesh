@@ -157,8 +157,8 @@ void MainView::paintGL() {
 
             (static_cast<Renderable *>(rndr->meshVector[ref_level]))->updateRenderable(this);
             renderRenderable(static_cast<Renderable *>(rndr->meshVector[ref_level]), greyShaderProg, GL_LINE_LOOP);
-            for (int i = 0; i < rndr->ptIndices[ref_level - 1]->size(); ++i)
-                renderRenderablePoints(static_cast<Renderable *>(rndr->meshVector[ref_level]), (*rndr->ptIndices[ref_level - 1])[i], 1);
+            if (mouseHandler->selectedPt != (unsigned long)(-1))
+                renderRenderablePoints(static_cast<Renderable *>(rndr->meshVector[ref_level]), mouseHandler->selectedPt, 1);
         }
     }
 

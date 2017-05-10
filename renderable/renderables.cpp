@@ -11,7 +11,8 @@ Renderables::Renderables()
       skeletonMesh(new ControlRenderable),
       edgeRenderable(new Renderable),
       faceRenderable(new Renderable),
-      renderableList(new QVector<Renderable *>)
+      renderableList(new QVector<Renderable *>),
+      controlVectors(new QVector<QVector <controlVec> >)
 {
     renderableList->clear();
     renderableList->squeeze();
@@ -21,7 +22,6 @@ Renderables::Renderables()
     renderableList->append(static_cast<Renderable *>(skeletonMesh));
     renderableList->append(edgeRenderable);
     renderableList->append(faceRenderable);
-
 }
 
 Renderables::~Renderables(){
@@ -46,6 +46,8 @@ void Renderables::init(Mesh *mesh){
 void Renderables::init(){    
     controlMesh->fillCoords();
     controlMesh->fillColours();
+
+    controlVectors->reserve(ccSteps);
 
     skeletonMesh->mesh = &(*controlMesh->mesh);
     updateEm();
@@ -112,7 +114,17 @@ void Renderables::threeRing(Vertex *vertex, QVector<unsigned int> *pts, int coun
     }
 }
 
+void Renderables::setRing(Vertex *vtx, controlVec &ctr){
+    vtx->colour = ctr.colour;
+    HalfEdge *currentEdge = vtx->out;
+    for (size_t i = 0; i < vtx->val; ++i){
+        currentEdge->target->colour = ctr.colour;
+        currentEdge = currentEdge->prev->twin;
+    }
+}
+
 void Renderables::updateEm(){
+    controlVectors->resize(ccSteps);
     skeletonMesh->fillCoords();
 
     size_t old_size = meshVector.size();
@@ -126,8 +138,12 @@ void Renderables::updateEm(){
 
     ternaryStep(skeletonMesh->mesh, meshVector[0]->mesh);
 
-    for (size_t refIndex = 0; refIndex < ccSteps; ++refIndex)
+    for (size_t refIndex = 0; refIndex < ccSteps; ++refIndex){
         subdivideCatmullClark(meshVector[refIndex]->mesh, meshVector[refIndex + 1]->mesh);
+        for (controlVec ctr : controlVectors->at(refIndex))
+            setRing(&meshVector[refIndex + 1]->mesh->Vertices[ctr.index], ctr);
+
+    }
 
     for (size_t i = 0; i < ccSteps + 1; ++i){
         meshVector[i]->fillCoords();
@@ -151,10 +167,15 @@ void Renderables::updateEm(){
     }
 
     HalfEdge *currentEdge;
+
     for (int i = 1; i < ccSteps; i++){
+
+        for (controlVec ctr : controlVectors->at(i-1))
+            ctr.print();
+
+
         counter = meshVector[i]->mesh->Faces.size();
         ptIndices.append(new QVector<unsigned int>);
-        qDebug() << i;
         for (int p = 0; p < ptIndices[i - 1]->size(); ++p){
             int index = (*ptIndices[i - 1])[p];
             if (index == controlMesh->maxInt)

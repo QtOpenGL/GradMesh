@@ -1,4 +1,5 @@
 #include "mousehandler.h"
+#include "renderable/renderables.h"
 #include <mainview.h>
 #include <QColor>
 #include <QColorDialog>
@@ -35,14 +36,19 @@ void MouseHandler::mousePressEvent(QMouseEvent *event) {
         break;
     case Qt::RightButton:
         selectedPt = findClosestPoint(xScene, yScene);
-        if (type != CONTROL)
-            break;
         QColor c = QColorDialog::getColor(Qt::white, static_cast<QWidget*>(mainview));
         if (c.isValid()){
-            rndrbles->controlMesh->mesh->Vertices[selectedPt].colour = QVector3D(c.redF(), c.greenF(), c.blueF());
-            rndrbles->controlMesh->fillColours();
+            if (mainview->ref_level == 0){
+                rndrbles->controlMesh->mesh->Vertices[selectedPt].colour = QVector3D(c.redF(), c.greenF(), c.blueF());
+                rndrbles->controlMesh->fillColours();
 
-            rndrbles->updateEm();
+                rndrbles->updateEm();
+            }
+            else {
+                Renderables::controlVec ctrVec = Renderables::controlVec(selectedPt, QVector3D(c.redF(), c.greenF(), c.blueF()), 1.0);
+                (*mainview->rndrbles->controlVectors)[mainview->ref_level - 1].append(ctrVec);
+                rndrbles->updateEm();
+            }
       }
       break;
     }
@@ -77,17 +83,36 @@ void MouseHandler::mouseMoveEvent(QMouseEvent *event) {
 
 short int MouseHandler::findClosestPoint(float _x, float _y) {
 
-    short int ptIndex = -1;
+    unsigned int ptIndex = -1;
     float currentDist, minDist = 1;
 
     type = NONE;
-    for (size_t k = 0; k < (size_t)(rndrbles->skeletonMesh->coords->size()); k++) {
-        currentDist = pow((rndrbles->skeletonMesh->coords->at(k)[0] - _x),2) + pow(( rndrbles->skeletonMesh->coords->at(k)[1] - _y),2);
-        if (currentDist < minDist) {
-            minDist = currentDist;
-            ptIndex = k;
+    if (mainview->ref_level == 0){
+        for (size_t k = 0; k < (size_t)(rndrbles->skeletonMesh->coords->size()); k++) {
+            currentDist = pow((rndrbles->skeletonMesh->coords->at(k)[0] - _x),2) + pow(( rndrbles->skeletonMesh->coords->at(k)[1] - _y),2);
+            qDebug() << currentDist;
+            if (currentDist < minDist) {
+                minDist = currentDist;
+                ptIndex = k;
+            }
         }
     }
+    else {
+        QVector<unsigned int> *indices = mainview->rndrbles->ptIndices[mainview->ref_level - 1];
+        Mesh *mesh = mainview->rndrbles->meshVector[mainview->ref_level]->mesh;
+        QVector2D point = QVector2D(_x,_y);
+        for (size_t k = 0; k < (size_t)(indices->size()); k++) {
+            if (indices->at(k) == mainview->rndrbles->controlMesh->maxInt)
+                continue;
+            currentDist = (mesh->Vertices.at(indices->at(k)).coords - point).lengthSquared();
+            if (currentDist < minDist) {
+                minDist = currentDist;
+                ptIndex = indices->at(k);
+            }
+        }
+        return ptIndex;
+    }
+
 
     if (ptIndex == -1){
         type = NONE;
