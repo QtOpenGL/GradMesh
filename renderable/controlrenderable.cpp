@@ -7,7 +7,6 @@ ControlRenderable::ControlRenderable()
 }
 
 void ControlRenderable::fillCoords(){
-
     coords->clear();
     coords->squeeze();
     colours->clear();

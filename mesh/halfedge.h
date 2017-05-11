@@ -22,6 +22,7 @@ public:
   // Inline constructors
 
   HalfEdge() {
+      qDebug() << "defult edge";
     target = nullptr;
     next = nullptr;
     prev = nullptr;
@@ -43,15 +44,15 @@ public:
     colGrad = hcolGrad;
   }
 
-  QVector2D start(){
+  inline QVector2D start() const{
       return twin->target->coords;
   }
 
-  QVector2D end(){
+  inline QVector2D end() const{
       return target->coords;
   }
 
-  float length(){
+  inline float length() const{
       return (start() - end()).length();
   }
 };

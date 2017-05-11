@@ -23,11 +23,7 @@ public:
 
     QVector<QVector<size_t> > PotentialTwins;
 
-    void copy(Mesh *mesh);
-
-    void dispVertInfo(unsigned short vertIndex);
-    void dispHalfEdgeInfo(unsigned short edgeIndex);
-    void dispFaceInfo(unsigned short faceIndex);
+    void copy(Mesh const *mesh);
 };
 
 #endif // MESH_H

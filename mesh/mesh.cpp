@@ -93,7 +93,6 @@ Mesh::Mesh(OBJFile* loadedOBJFile) {
   for (k=0; k<(size_t)Vertices.size(); k++) {
     if (PotentialTwins[k].size() == 0) {
       qWarning() << " ! Isolated Vertex? PotentialTwins empty for Index" << k;
-      dispVertInfo(k);
       continue;
     }
     Vertices[k].out = &HalfEdges[PotentialTwins[k][0]];
@@ -116,7 +115,7 @@ Mesh::Mesh(OBJFile* loadedOBJFile) {
 
 }
 
-void Mesh::copy(Mesh *mesh){
+void Mesh::copy(Mesh const *mesh){
 
     if (mesh == nullptr){
         qDebug() << "Copying nullptr mesh";
@@ -138,9 +137,9 @@ void Mesh::copy(Mesh *mesh){
     Faces.clear();
     Faces.reserve(numFaces);
 
-    Vertex   *currentVertex;
-    HalfEdge *currentEdge;
-    Face     *currentFace;
+    Vertex   const *currentVertex;
+    HalfEdge const *currentEdge;
+    Face     const *currentFace;
 
     for (size_t vs = 0; vs < numVerts; ++vs){
         currentVertex = &mesh->Vertices[vs];
@@ -223,7 +222,8 @@ Mesh::~Mesh() {
       HalfEdges.squeeze();
       Faces.clear();
       Faces.squeeze();
-
+      PotentialTwins.clear();
+      PotentialTwins.squeeze();
 }
 
 void Mesh::setTwins(size_t numHalfEdges, size_t indexH) {
@@ -316,18 +316,3 @@ void Mesh::setTwins(size_t numHalfEdges, size_t indexH) {
   }
 }
 
-void Mesh::dispVertInfo(unsigned short vertIndex) {
-  Vertex* dispVert = &Vertices[vertIndex];
-  qDebug() << "Vertex at Index =" << dispVert->index << "Coords =" << dispVert->coords << "Out =" << dispVert->out << "Val =" << dispVert->val;
-}
-
-void Mesh::dispHalfEdgeInfo(unsigned short edgeIndex) {
-  HalfEdge* dispEdge = &HalfEdges[edgeIndex];
-  qDebug() << "HalfEdge at Index =" << dispEdge->index << "Target =" << dispEdge->target <<
-              "Next =" << dispEdge->next << "Prev =" << dispEdge->prev << "Twin =" << dispEdge->twin << "Poly =" << dispEdge->polygon;
-}
-
-void Mesh::dispFaceInfo(unsigned short faceIndex){
-  Face* dispFace = &Faces[faceIndex];
-  qDebug() << "Face at Index =" << dispFace->index << "Side =" << dispFace->side << "Val =" << dispFace->val;
-}

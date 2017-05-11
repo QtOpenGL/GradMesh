@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     subdiv/catmullclark.cpp \
     subdiv/ccsingleface.cpp \
     subdiv/makengon.cpp \
-    mesh/vertinfo.cpp
+    mesh/vertinfo.cpp \
+    mesh/vertex.cpp
 
 HEADERS  += mainwindow.h \
     mainview.h \

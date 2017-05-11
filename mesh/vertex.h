@@ -18,39 +18,10 @@ public:
   unsigned short sharpness;
   QVector3D colour;
 
-  // Inline constructors
-  Vertex() {
-    // qDebug() << "Default Vertex Constructor";
-    coords = QVector2D();
-    out = nullptr;
-    val = 0;
-    index = 0;
-    sharpness = 0;
-    colour = QVector3D();
-  }
-
-  Vertex(QVector2D &vcoords, HalfEdge* vout, unsigned short vval, unsigned int vindex,
-         float vsharpness = 0, QVector3D vcolour = QVector3D(1.0, 1.0, 0.0)) {
-    //qDebug() << "QVector3D Vertex Constructor";
-    coords = vcoords;
-    out = vout;
-    val = vval;
-    index = vindex;
-    sharpness = vsharpness;
-    colour = vcolour;
-  }
-
-  Vertex(VertInfo *info, HalfEdge* vout, unsigned short vval, unsigned int vindex, float vsharpness = 0) {
-    //qDebug() << "QVector3D Vertex Constructor";
-    coords = info->pos;
-    out = vout;
-    val = vval;
-    index = vindex;
-    sharpness = vsharpness;
-    colour = info->col;
-    delete info;
-  }
-
+  Vertex();
+  Vertex(QVector2D const &vcoords, HalfEdge* vout, unsigned short vval, unsigned int vindex,
+         float vsharpness = 0, QVector3D const vcolour = QVector3D(1.0, 1.0, 0.0));
+  Vertex(VertInfo const *info, HalfEdge* vout, unsigned short vval, unsigned int vindex, float vsharpness = 0);
 };
 
 

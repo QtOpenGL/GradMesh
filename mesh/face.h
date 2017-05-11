@@ -19,11 +19,12 @@ public:
         index = 0;
     }
 
-    Face(HalfEdge* fside, unsigned short fval, unsigned int findex) {
-        side = fside;
-        val = fval;
-        index = findex;
-    }
+    Face(HalfEdge* fside, unsigned short fval, unsigned int findex)
+        :
+        side(fside),
+        val(fval),
+        index(findex)
+    {}
 
 };
 

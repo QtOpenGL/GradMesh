@@ -45,7 +45,6 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
     }
 
 //  qDebug() << " * Created face points";
-    VertInfo newVert;
   vIndex = numFaces;
   // Create vertex points
   for (k=0; k<numVerts; k++) {
