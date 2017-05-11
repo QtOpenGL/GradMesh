@@ -33,7 +33,17 @@ public:
     colGrad = QVector2D(0.0,0.0);
   }
 
-  HalfEdge(Vertex* htarget, HalfEdge* hnext, HalfEdge* hprev, HalfEdge* htwin, Face* hpolygon, unsigned int hindex, float hsharpness=0, QVector2D hcolGrad = QVector2D(0.0, 0.0)) {
+  HalfEdge(Vertex* htarget, HalfEdge* hnext, HalfEdge* hprev, HalfEdge* htwin, Face* hpolygon, unsigned int hindex, float hsharpness=0) {
+    target = htarget;
+    next = hnext;
+    prev = hprev;
+    twin = htwin;
+    polygon = hpolygon;
+    index = hindex;
+    sharpness = hsharpness;
+  }
+
+  HalfEdge(Vertex* htarget, HalfEdge* hnext, HalfEdge* hprev, HalfEdge* htwin, Face* hpolygon, unsigned int hindex, float hsharpness, QVector2D const &hcolGrad) {
     target = htarget;
     next = hnext;
     prev = hprev;

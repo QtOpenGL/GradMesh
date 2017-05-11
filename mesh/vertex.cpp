@@ -10,7 +10,7 @@ Vertex::Vertex() {
   colour = QVector3D();
 }
 
-Vertex::Vertex(QVector2D const &vcoords, HalfEdge* vout, unsigned short vval, unsigned int vindex, float vsharpness, QVector3D const vcolour)
+Vertex::Vertex(QVector2D const &vcoords, HalfEdge* vout, unsigned short vval, unsigned int vindex, float vsharpness, QVector3D const &vcolour)
     :
   coords(vcoords),
   out(vout),

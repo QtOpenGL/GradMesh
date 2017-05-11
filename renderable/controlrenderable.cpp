@@ -14,20 +14,20 @@ void ControlRenderable::fillCoords(){
     indices->clear();
     indices->squeeze();
 
-    Vertex *currentVertex;
     HalfEdge *currentEdge;
     unsigned int index = 0;
     size_t n;
-    for (size_t k=0; k < (size_t)mesh->Vertices.size(); ++k){
-        currentVertex = &mesh->Vertices[k];
-        coords->append(currentVertex->coords);
-        colours->append(currentVertex->colour);
+    QVector2D vtxCoords;
+    for (Vertex const &vtx : mesh->Vertices){
+        vtxCoords = vtx.coords;
+        coords->append(vtxCoords);
+        colours->append(vtx.colour);
         indices->append(index);
 
-        n = currentVertex->val;
-        currentEdge = currentVertex->out;
+        n = vtx.val;
+        currentEdge = vtx.out;
         for (size_t l = 0; l < n; ++l){
-            coords->append(currentVertex->coords + currentEdge->colGrad);
+            coords->append(vtxCoords + currentEdge->colGrad);
             indices->append(index);
             colours->append(QVector3D({1.0, 1.0, 1.0}));
 

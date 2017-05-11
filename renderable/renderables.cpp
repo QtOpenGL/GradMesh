@@ -240,10 +240,10 @@ void Renderables::updateEm(){
             setRing(&meshVector[refIndex + 1]->mesh->Vertices[std::get<0>(ctr)], ctr);
     }
 
-    for (size_t i = 0; i < ccSteps + 1; ++i){
-        meshVector[i]->fillCoords();
-        meshVector[i]->fillColours();
-    }
+//    for (size_t i = 0; i < ccSteps + 1; ++i){
+//        meshVector[i]->fillCoords();
+//        meshVector[i]->fillColours();
+//    }
 
     colourSurface->mesh = meshVector[ccSteps]->mesh;
 

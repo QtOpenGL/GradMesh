@@ -20,7 +20,7 @@ public:
 
   Vertex();
   Vertex(QVector2D const &vcoords, HalfEdge* vout, unsigned short vval, unsigned int vindex,
-         float vsharpness = 0, QVector3D const vcolour = QVector3D(1.0, 1.0, 0.0));
+         float vsharpness = 0, QVector3D const &vcolour = QVector3D(1.0, 1.0, 0.0));
   Vertex(VertInfo const *info, HalfEdge* vout, unsigned short vval, unsigned int vindex, float vsharpness = 0);
 };
 

@@ -137,6 +137,11 @@ void MainView::paintGL() {
         if (not rndr->meshVector[i]->isRegistered)
             rndr->meshVector[i]->registerRenderable(this);
 
+    if (ref_level != 0){
+        rndr->meshVector[ref_level]->fillCoords();
+        rndr->meshVector[ref_level]->fillColours();
+    }
+
     if (rndr->colourSurface->hasMesh() && showColourSurface){
         (static_cast<Renderable *>(rndr->colourSurface))->updateRenderable(this);
         renderRenderable(static_cast<Renderable *>(rndr->colourSurface), mainShaderProg, GL_TRIANGLE_FAN);
@@ -144,7 +149,6 @@ void MainView::paintGL() {
 
     if (rndr->colourSurface->hasMesh() && showSkeleton){
         (static_cast<Renderable *>(rndr->colourSurface))->updateRenderable(this);
-//        renderRenderable(static_cast<Renderable *>(rndr->colourSurface), blackShaderProg, GL_LINE_LOOP);
         renderRenderablePoints(static_cast<Renderable *>(rndr->colourSurface), 0, rndr->colourSurface->indices->size(), true);
     }
 
@@ -156,8 +160,8 @@ void MainView::paintGL() {
         if (ref_level > 0){
             rndr->meshVector[ref_level]->indices->clear();
             rndr->meshVector[ref_level]->indices->squeeze();
-            for (size_t i = 0; i < static_cast<size_t>(rndr->ptIndices[ref_level - 1]->size()); ++i)
-                rndr->meshVector[ref_level]->indices->append((*rndr->ptIndices[ref_level - 1])[i]);
+            for (size_t index : *rndr->ptIndices[ref_level - 1])
+                rndr->meshVector[ref_level]->indices->append(index);
 
             (static_cast<Renderable *>(rndr->meshVector[ref_level]))->updateRenderable(this);
             renderRenderable(static_cast<Renderable *>(rndr->meshVector[ref_level]), greyShaderProg, GL_LINE_LOOP);
