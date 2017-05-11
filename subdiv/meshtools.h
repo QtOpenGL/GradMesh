@@ -8,10 +8,10 @@
 
 void subdivideCatmullClark(Mesh* inputMesh, Mesh *subdivMesh);
 
-VertInfo vertexPoint(HalfEdge* firstEdge, Mesh *newMesh);
-VertInfo edgePoint(HalfEdge* firstEdge, Mesh* newMesh);
+VertInfo *vertexPoint(HalfEdge* firstEdge, Mesh *newMesh);
+VertInfo *edgePoint(HalfEdge* firstEdge, Mesh* newMesh);
 VertInfo *facePoint(HalfEdge* firstEdge);
-VertInfo avEdgePoint(HalfEdge *currentEdge);
+VertInfo *avEdgePoint(HalfEdge *currentEdge);
 HalfEdge* vertOnBoundary(Vertex* currentVertex);
 QString vtxToString(Vertex * vtx);
 QString vtxToString(VertInfo * vtx);

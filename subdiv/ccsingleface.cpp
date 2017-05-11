@@ -34,8 +34,7 @@ OBJFile ccSingleFace(Mesh *inputMesh, size_t faceToBeRefined){
     HalfEdge *currentEdge = currentFace->side;
 
     for (size_t i = 0; i < n; ++i){
-        vertInfo = avEdgePoint(currentEdge);
-        str.append(vtxToString(&vertInfo));
+        str.append(vtxToString(avEdgePoint(currentEdge)));
         str += QString("\n");
         ++numVerts;
 

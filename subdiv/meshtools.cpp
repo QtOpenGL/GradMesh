@@ -4,12 +4,11 @@ float max(double a, double b){
     return a > b ? a : b;
 }
 
-VertInfo vertexPoint(HalfEdge* firstEdge, Mesh* subdivMesh) {
+VertInfo *vertexPoint(HalfEdge* firstEdge, Mesh* subdivMesh) {
     // This functions handels vertices with (possibly fractional) sharpness.
 
   unsigned short k, n;
-  VertInfo sumStarPts, sumFacePts;
-  VertInfo vertexPt;
+  VertInfo *vertexPt = new VertInfo;
 
   HalfEdge* currentEdge;
   Vertex* currentVertex;
@@ -26,7 +25,7 @@ VertInfo vertexPoint(HalfEdge* firstEdge, Mesh* subdivMesh) {
       if (currentEdge->sharpness > 0.0){
           sharpness += currentEdge->sharpness;
           ++incidentCreases;
-          vertexPt += currentEdge->target;
+          *vertexPt += currentEdge->target;
       }
       currentEdge = currentEdge->prev->twin;
   }
@@ -34,16 +33,17 @@ VertInfo vertexPoint(HalfEdge* firstEdge, Mesh* subdivMesh) {
   // At this point, vertexPt is the sum of the vertices connected to currentVertex by sharp edges.
   if (incidentCreases >= 3){ // Vertex is a corner
   // VertInfo vt(currentVertex->coords, currentVertex->colour);
-      return VertInfo(currentVertex);
+      delete vertexPt;
+      return new VertInfo(currentVertex);
   }
   if (incidentCreases == 2){
-      vertexPt += 6.0 * currentVertex->coords;
-      vertexPt += 6.0 * currentVertex->colour;
-      vertexPt /= 8.0;
+      *vertexPt += 6.0 * currentVertex->coords;
+      *vertexPt += 6.0 * currentVertex->colour;
+      *vertexPt /= 8.0;
       if (sharpness < 2.0){
           sharpness /= 2; // Average edge sharpness of incident edges
-          vertexPt *= sharpness;
-          vertexPt += currentVertex->coords *  (1-sharpness);
+          *vertexPt *= sharpness;
+          *vertexPt += currentVertex->coords *  (1-sharpness);
       }
       return vertexPt;
   }
@@ -51,66 +51,75 @@ VertInfo vertexPoint(HalfEdge* firstEdge, Mesh* subdivMesh) {
   // Catmull-Clark (also supporting initial meshes containing n-gons)
   if (HalfEdge* boundaryEdge = vertOnBoundary(currentVertex)) {
     if (boundaryEdge->twin->target->val == 2) {
-      // Interpolate corners
-      return VertInfo(boundaryEdge->twin->target);
+        delete vertexPt;
+        return new VertInfo(boundaryEdge->twin->target);
     }
     else {
-        vertexPt.pos  = 1.0 * boundaryEdge->target->coords;
-        vertexPt += 6.0 * boundaryEdge->twin->target->coords;
-        vertexPt += 1.0 * boundaryEdge->prev->twin->target->coords;
+        vertexPt->pos  = 1.0 * boundaryEdge->target->coords;
+        *vertexPt += 6.0 * boundaryEdge->twin->target->coords;
+        *vertexPt += 1.0 * boundaryEdge->prev->twin->target->coords;
 
-        vertexPt.col  = 1.0 * boundaryEdge->target->colour;
-        vertexPt += 6.0 * boundaryEdge->twin->target->colour;
-        vertexPt += 1.0 * boundaryEdge->prev->twin->target->colour;
+        vertexPt->col  = 1.0 * boundaryEdge->target->colour;
+        *vertexPt += 6.0 * boundaryEdge->twin->target->colour;
+        *vertexPt += 1.0 * boundaryEdge->prev->twin->target->colour;
 
-        vertexPt /= 8.0;
+        *vertexPt /= 8.0;
     }
   }
   else {
+      VertInfo *sumStarPts = new VertInfo;
+      VertInfo *sumFacePts = new VertInfo;
+
     for (k=0; k<n; k++) {
-      sumStarPts += currentEdge->target;
-      sumFacePts += subdivMesh->Vertices[currentEdge->polygon->index];
+      *sumStarPts += currentEdge->target;
+      *sumFacePts += subdivMesh->Vertices[currentEdge->polygon->index];
       currentEdge = currentEdge->prev->twin;
     }
-    sumStarPts /= n;
-    sumFacePts /= n;
+    *sumStarPts /= n;
+    *sumFacePts /= n;
 
-    vertexPt.pos = ((n-2)*currentVertex->coords + sumStarPts.pos + sumFacePts.pos)/n;
-    vertexPt.col = ((n-2)*currentVertex->colour + sumStarPts.col + sumFacePts.col)/n;
+    vertexPt->pos = ((n-2)*currentVertex->coords + sumStarPts->pos + sumFacePts->pos)/n;
+    vertexPt->col = ((n-2)*currentVertex->colour + sumStarPts->col + sumFacePts->col)/n;
+    delete sumStarPts;
+    delete sumFacePts;
   }
 
   return vertexPt;
 }
 
-VertInfo ccEdgePoint(HalfEdge *currentEdge, Mesh *subdivMesh){
-    VertInfo point(currentEdge->target);
-    point     += currentEdge->twin->target;
-    point     += subdivMesh->Vertices[currentEdge->polygon->index];
-    point     += subdivMesh->Vertices[currentEdge->twin->polygon->index];
+VertInfo *ccEdgePoint(HalfEdge *currentEdge, Mesh *subdivMesh){
+    VertInfo *point = new VertInfo(currentEdge->target);
+    *point     += currentEdge->twin->target;
+    *point     += subdivMesh->Vertices[currentEdge->polygon->index];
+    *point     += subdivMesh->Vertices[currentEdge->twin->polygon->index];
 
-    point /= 4.0;
+    *point /= 4.0;
     return point;
 }
 
-VertInfo avEdgePoint(HalfEdge *currentEdge){
-    VertInfo point(currentEdge->target);
-    point  += currentEdge->twin->target;
+VertInfo *avEdgePoint(HalfEdge *currentEdge){
+    VertInfo *point = new VertInfo(currentEdge->target);
+    *point  += currentEdge->twin->target;
 
-    point /= 2.0;
+    *point /= 2.0;
     return point;
 }
 
-VertInfo edgePoint(HalfEdge* firstEdge, Mesh* subdivMesh) {
-    // This is for (possibly fractional) sharpness edges, this is nicely cleaned up and factorized
-  HalfEdge* currentEdge;
-  currentEdge = firstEdge;
+VertInfo *edgePoint(HalfEdge* firstEdge, Mesh* subdivMesh) {
+  HalfEdge* currentEdge = firstEdge;
 
   float sharpness = currentEdge->sharpness;
   if (!currentEdge->polygon || !currentEdge->twin->polygon || sharpness > 1.0) // Edge is boundary or sharpness > 1.0
     return avEdgePoint(currentEdge);
 
   if (sharpness > 0.0){ // sharpness  > 0.0, lerp between smooth and sharp
-      return avEdgePoint(currentEdge) * sharpness + ccEdgePoint(currentEdge, subdivMesh) * (1 - sharpness);
+      VertInfo *point = new VertInfo;
+      VertInfo *left = avEdgePoint(currentEdge);
+      VertInfo *right = ccEdgePoint(currentEdge, subdivMesh);
+      *point = (*left) * sharpness + (*right) * (1 - sharpness);
+      delete left;
+      delete right;
+      return point;
   }
 
   // Edge is smmooth

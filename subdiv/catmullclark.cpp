@@ -49,13 +49,10 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
   // Create vertex points
   for (k=0; k<numVerts; k++) {
       n = inputMesh->Vertices[k].val;
-      newVert = vertexPoint(inputMesh->Vertices[k].out, subdivMesh);
-      subdivMesh->Vertices.append( Vertex(newVert.pos,
+      subdivMesh->Vertices.append( Vertex(vertexPoint(inputMesh->Vertices[k].out, subdivMesh),
                                           nullptr,
                                           n,
-                                          vIndex,
-                                          0,
-                                          newVert.col
+                                          vIndex
                                           ) );
       vIndex++;
     }
@@ -68,14 +65,11 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
 
     if (k < currentEdge->twin->index) {
       m = (!currentEdge->polygon || !currentEdge->twin->polygon) ? 3 : 4;
-      newVert = edgePoint(currentEdge, subdivMesh);
       // Coords (x,y), Out, Valence, Index
-      subdivMesh->Vertices.append( Vertex(newVert.pos,
+      subdivMesh->Vertices.append( Vertex(edgePoint(currentEdge, subdivMesh),
                                           nullptr,
                                           m,
-                                          vIndex,
-                                          0,
-                                          newVert.col) );
+                                          vIndex) );
       vIndex++;
     }
   }
