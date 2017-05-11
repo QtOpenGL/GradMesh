@@ -27,7 +27,7 @@ public:
     short int findClosestFace(float x, float y);
     short int findClosestGrad(float x, float y);
 
-    QVector<QVector2D> *grad = nullptr;
+    QVector<QVector2D> *grad = nullptr; // For setting gradients of refined levels
     Vertex *refVert = nullptr;
 
     MainView *mainview;

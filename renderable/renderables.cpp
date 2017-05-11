@@ -187,7 +187,7 @@ void Renderables::setRing(Vertex *vtx, controlVec &ctr){
     if (beta < 0)
         qDebug() << alpha;
 
-    vtx->colour = colour;
+    vtx->colour = alpha * colour;
     bool isEdgeVtx = isEdgeVertex(vtx);
     HalfEdge *currentEdge;
     if (isEdgeVtx){
@@ -197,6 +197,7 @@ void Renderables::setRing(Vertex *vtx, controlVec &ctr){
     else
         currentEdge = vtx->out;
 
+    colour *= beta;
     for (size_t i = 0; i < n; ++i){
         currentEdge->target->colour = colour;
         currentEdge->next->target->colour = colour;
@@ -237,7 +238,6 @@ void Renderables::updateEm(){
         subdivideCatmullClark(meshVector[refIndex]->mesh, meshVector[refIndex + 1]->mesh);
         for (controlVec ctr : controlVectors->at(refIndex))
             setRing(&meshVector[refIndex + 1]->mesh->Vertices[std::get<0>(ctr)], ctr);
-
     }
 
     for (size_t i = 0; i < ccSteps + 1; ++i){

@@ -79,10 +79,11 @@ void MouseHandler::mouseMoveEvent(QMouseEvent *event) {
     xScene = (1-xRatio)*-1 + xRatio*1;
     yScene = yRatio*-1 + (1-yRatio)*1;
 
+    QVector2D mousePt = QVector2D(xScene, yScene);
     switch (selectType){
     case POINTS:
         if (mainview->ref_level == 0){
-            rndrbles->controlMesh->mesh->Vertices[selectedPt].coords = QVector2D(xScene, yScene);
+            rndrbles->controlMesh->mesh->Vertices[selectedPt].coords = mousePt;
             rndrbles->controlMesh->fillCoords();
             rndrbles->skeletonMesh->fillCoords();
         }
@@ -93,12 +94,12 @@ void MouseHandler::mouseMoveEvent(QMouseEvent *event) {
 
         if (mainview->ref_level == 0){
             HalfEdge *currentEdge = &(rndrbles)->controlMesh->mesh->HalfEdges[selectedGrad];
-            currentEdge->colGrad = QVector2D(xScene, yScene) - rndrbles->controlMesh->mesh->Vertices[currentEdge->twin->target->index].coords;
+            currentEdge->colGrad = mousePt - refVert->coords;
             rndrbles->skeletonMesh->fillCoords();
         }
-        else {
-            (*grad)[selectedGrad] = QVector2D(xScene, yScene) - refVert->coords;
-        }
+        else
+            (*grad)[selectedGrad] = mousePt - refVert->coords;
+
         break;
     }
     rndrbles->updateEm();
@@ -146,6 +147,7 @@ short int MouseHandler::findClosestGrad(float _x, float _y) {
             if (currentDist < minDist) {
                 minDist = currentDist;
                 ptIndex = edge.index;
+                refVert = edge.twin->target;
             }
         }
     }

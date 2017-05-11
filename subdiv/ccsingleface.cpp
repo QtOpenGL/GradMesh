@@ -49,8 +49,7 @@ OBJFile ccSingleFace(Mesh *inputMesh, size_t faceToBeRefined){
     }
 
     currentEdge = inputMesh->Faces[faceToBeRefined].side;
-    vertInfo = facePoint(currentEdge);
-    str.append(vtxToString(&vertInfo));
+    str.append(vtxToString(facePoint(currentEdge)));
     str.append("\n");
 
     currentFace = &inputMesh->Faces[faceToBeRefined];

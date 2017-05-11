@@ -117,7 +117,7 @@ VertInfo edgePoint(HalfEdge* firstEdge, Mesh* subdivMesh) {
   return ccEdgePoint(currentEdge, subdivMesh);
 }
 
-VertInfo facePoint(HalfEdge* firstEdge)
+VertInfo *facePoint(HalfEdge* firstEdge)
 {
   unsigned short k, n;
   QVector<float> stencil;
@@ -130,17 +130,16 @@ VertInfo facePoint(HalfEdge* firstEdge)
   stencil.fill(1.0/n, n);
 
   currentEdge = firstEdge;
-  VertInfo facePt;
+  VertInfo *facePt = new VertInfo;
 
   for (k=0; k<n; k++) {
     // General approach
-      facePt += stencil[k] * currentEdge->target->coords;
-      facePt += stencil[k] * currentEdge->target->colour;
+      *facePt += stencil[k] * currentEdge->target->coords;
+      *facePt += stencil[k] * currentEdge->target->colour;
       currentEdge = currentEdge->next;
   }
 
   return facePt;
-
 }
 
 HalfEdge* vertOnBoundary(Vertex* currentVertex) {

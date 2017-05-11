@@ -4,6 +4,7 @@
 #include <QVector2D>
 #include <QVector3D>
 #include <QDebug>
+#include "vertinfo.h"
 
 // Forward declaration
 class HalfEdge;
@@ -37,6 +38,17 @@ public:
     index = vindex;
     sharpness = vsharpness;
     colour = vcolour;
+  }
+
+  Vertex(VertInfo *info, HalfEdge* vout, unsigned short vval, unsigned int vindex, float vsharpness = 0) {
+    //qDebug() << "QVector3D Vertex Constructor";
+    coords = info->pos;
+    out = vout;
+    val = vval;
+    index = vindex;
+    sharpness = vsharpness;
+    colour = info->col;
+    delete info;
   }
 
 };

@@ -27,7 +27,7 @@ SOURCES += main.cpp\
     subdiv/catmullclark.cpp \
     subdiv/ccsingleface.cpp \
     subdiv/makengon.cpp \
-    dialog.cpp
+    mesh/vertinfo.cpp
 
 HEADERS  += mainwindow.h \
     mainview.h \
@@ -45,17 +45,15 @@ HEADERS  += mainwindow.h \
     renderable/meshrenderable.h \
     renderable/renderables.h \
     renderable/controlrenderable.h \
-    utilities.h \
-    dialog.h
+    utilities.h
 
-FORMS    += mainwindow.ui \
-    dialog.ui
+FORMS    += mainwindow.ui
 
 RESOURCES += \
     resources.qrc
 
 CONFIG += c++11
 
-QMAKE_CXXFLAGS += -Wall -pedantic
+QMAKE_CXXFLAGS += -Wall -pedantic -O6
 
 
