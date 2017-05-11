@@ -10,9 +10,9 @@ Renderables::Renderables()
       controlMesh(new MeshRenderable),
       colourSurface(new MeshRenderable),
       skeletonMesh(new ControlRenderable),
+      gradRenderable(new Renderable),
       edgeRenderable(new Renderable),
       faceRenderable(new Renderable),
-      gradRenderable(new Renderable),
       renderableList(new QVector<Renderable *>),
       controlVectors(new QVector<QVector <controlVec> >)
 {
@@ -176,7 +176,7 @@ void Renderables::setRing(Vertex *vtx, controlVec &ctr){
     float alpha;
     QVector<QVector2D> *grads;
     std::tie(index, colour, alpha, grads) = ctr;
-    int n = vtx->val;
+    size_t n = vtx->val;
     float beta = (n * (n + 5.0f - n * alpha)) / (5.0f * n);
 
     if (beta < 0){
@@ -214,7 +214,7 @@ void Renderables::setRing(Vertex *vtx, controlVec &ctr){
         currentEdge = vtx->out;
 
     for (size_t i = 0; i < n; ++i){
-        currentEdge->next->target->coords = currentEdge->target->coords + currentEdge->prev->twin->target->coords - vtx->coords;
+        currentEdge->next->target->coords = currentEdge->end()+ currentEdge->prev->twin->end() - vtx->coords;
         currentEdge = currentEdge->prev->twin;
     }
 }
@@ -256,16 +256,16 @@ void Renderables::updateEm(){
 
     QVector<Face> const *cFaces = &controlMesh->mesh->Faces;
     int counter = -1;
-    for (size_t i = 0; i < static_cast<size_t>(cFaces->size()); ++i){
-        counter += 2 * controlMesh->mesh->Faces[i].val + 1;
+//    for (size_t i = 0; i < static_cast<size_t>(cFaces->size()); ++i){
+    for (auto const &face : *cFaces){
+        counter += 2 * face.val + 1;
         threeRing(&meshVector[1]->mesh->Vertices[counter], ptIndices[0], counter);
     }
 
-    for (int i = 1; i < ccSteps; i++){
+    for (size_t i = 1; i < ccSteps; i++){
         counter = meshVector[i]->mesh->Faces.size();
         ptIndices.append(new QVector<unsigned int>);
-        for (int p = 0; p < ptIndices[i - 1]->size(); ++p){
-            int index = (*ptIndices[i - 1])[p];
+        for (size_t index : *ptIndices[i - 1]){
             if (index == controlMesh->maxInt)
                 continue;
             threeRing(&meshVector[i + 1]->mesh->Vertices[counter + index], ptIndices[i], counter + index);

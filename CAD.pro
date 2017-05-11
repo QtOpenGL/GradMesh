@@ -54,6 +54,6 @@ RESOURCES += \
 
 CONFIG += c++11
 
-QMAKE_CXXFLAGS += -Wall -pedantic -O6
+QMAKE_CXXFLAGS += -Wall -pedantic -O3 -Werror
 
 

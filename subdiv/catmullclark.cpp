@@ -31,15 +31,16 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
   subdivMesh->HalfEdges.reserve(2*numHalfEdges + 2*sumFaceValences);
   subdivMesh->Faces.reserve(sumFaceValences);
 
+  QVector<Vertex> *vertices = &subdivMesh->Vertices;
   // Create face points
-  for (k=0; k<numFaces; k++) {
-      n = inputMesh->Faces[k].val;
+  for (Face const &face : inputMesh->Faces){
+      n = face.val;
 //      newVertT = facePoint(inputMesh->Faces[k].side);
       // Coords (x,y), Out, Valence, Index
-      subdivMesh->Vertices.append( Vertex(facePoint(inputMesh->Faces[k].side),
+      vertices->append( Vertex(facePoint(face.side),
                                           nullptr,
                                           n,
-                                          k
+                                          face.index
                                           ) );
     }
 
@@ -49,7 +50,7 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
   // Create vertex points
   for (k=0; k<numVerts; k++) {
       n = inputMesh->Vertices[k].val;
-      subdivMesh->Vertices.append( Vertex(vertexPoint(inputMesh->Vertices[k].out, subdivMesh),
+      vertices->append( Vertex(vertexPoint(inputMesh->Vertices[k].out, subdivMesh),
                                           nullptr,
                                           n,
                                           vIndex
@@ -66,10 +67,11 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
     if (k < currentEdge->twin->index) {
       m = (!currentEdge->polygon || !currentEdge->twin->polygon) ? 3 : 4;
       // Coords (x,y), Out, Valence, Index
-      subdivMesh->Vertices.append( Vertex(edgePoint(currentEdge, subdivMesh),
+      vertices->append( Vertex(edgePoint(currentEdge, subdivMesh),
                                           nullptr,
                                           m,
-                                          vIndex) );
+                                          vIndex,
+                                          0) );
       vIndex++;
     }
   }
@@ -105,12 +107,12 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
       subdivMesh->Faces[fIndex].side = &subdivMesh->HalfEdges[ 2*t ];
 
       // Target, Next, Prev, Twin, Poly, Index
-      subdivMesh->HalfEdges.append(HalfEdge( &subdivMesh->Vertices[k],
+      subdivMesh->HalfEdges.append(HalfEdge( &(*vertices)[k],
                                              nullptr,
                                              &subdivMesh->HalfEdges[ 2*t ],
-                                   nullptr,
-                                   &subdivMesh->Faces[fIndex],
-                                   hIndex ));
+                                             nullptr,
+                                             &subdivMesh->Faces[fIndex],
+                                             hIndex ));
 
       subdivMesh->HalfEdges.append(HalfEdge( nullptr,
                                              &subdivMesh->HalfEdges[2*s+1],
@@ -148,7 +150,7 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
     subdivMesh->HalfEdges[hIndex-2].twin = &subdivMesh->HalfEdges[hIndex-2*n+1];
 
     // For face points
-    subdivMesh->Vertices[k].out = &subdivMesh->HalfEdges[hIndex-1];
+    (*vertices)[k].out = &subdivMesh->HalfEdges[hIndex-1];
 
   }
 
@@ -156,11 +158,11 @@ void subdivideCatmullClark(Mesh* inputMesh, Mesh* subdivMesh) {
 
   // For vertex points
   for (k=0; k<numVerts; k++) {
-    subdivMesh->Vertices[numFaces + k].out = &subdivMesh->HalfEdges[ 2*inputMesh->Vertices[k].out->index ];
+    (*vertices)[numFaces + k].out = &subdivMesh->HalfEdges[ 2*inputMesh->Vertices[k].out->index ];
   }
 
 //  qDebug() << " * Completed the Catmull-Clark step!";
-//  qDebug() << "   # Vertices:" << subdivMesh->Vertices.size();
+//  qDebug() << "   # Vertices:" << vertices->size();
 //  qDebug() << "   # HalfEdges:" << subdivMesh->HalfEdges.size();
 //  qDebug() << "   # Faces:" << subdivMesh->Faces.size();
 

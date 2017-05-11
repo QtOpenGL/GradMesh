@@ -101,6 +101,10 @@ void MouseHandler::mouseMoveEvent(QMouseEvent *event) {
             (*grad)[selectedGrad] = mousePt - refVert->coords;
 
         break;
+    case EDGES:
+        break;
+    case FACES:
+        break;
     }
     rndrbles->updateEm();
 }

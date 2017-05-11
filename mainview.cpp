@@ -156,12 +156,12 @@ void MainView::paintGL() {
         if (ref_level > 0){
             rndr->meshVector[ref_level]->indices->clear();
             rndr->meshVector[ref_level]->indices->squeeze();
-            for (size_t i = 0; i < rndr->ptIndices[ref_level - 1]->size(); ++i)
+            for (size_t i = 0; i < static_cast<size_t>(rndr->ptIndices[ref_level - 1]->size()); ++i)
                 rndr->meshVector[ref_level]->indices->append((*rndr->ptIndices[ref_level - 1])[i]);
 
             (static_cast<Renderable *>(rndr->meshVector[ref_level]))->updateRenderable(this);
             renderRenderable(static_cast<Renderable *>(rndr->meshVector[ref_level]), greyShaderProg, GL_LINE_LOOP);
-            if (mouseHandler->selectedPt != (unsigned long)(-1))
+            if (mouseHandler->selectedPt != -1)
                 renderRenderablePoints(static_cast<Renderable *>(rndr->meshVector[ref_level]), mouseHandler->selectedPt, 1, true);
         }
     }
